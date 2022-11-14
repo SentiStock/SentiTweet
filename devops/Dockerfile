@@ -8,8 +8,6 @@ ENV DJANGO_ENV dev
 
 RUN apt-get update
 
-# RUN apt-get install mariadb-server -y
-
 COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip
@@ -19,10 +17,8 @@ RUN pip install -r /app/requirements.txt
 
 # Set the working directory to /app/
 COPY ./sentitweet/ /app/
-# COPY ./devops/mysqlssl/ /app/mysqlssl/
 WORKDIR /app/
 
 EXPOSE 8000
 
-# RUN python backend/manage.py migrate
 CMD python manage.py runserver 0.0.0.0:8000 && gunicorn --bind 0.0.0.0:8000 sentitweet.backend.wsgi
