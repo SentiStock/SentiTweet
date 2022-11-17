@@ -1,0 +1,5 @@
+<h1>HELLO WORLD!!</h1>
+
+{%for company in companies%}
+    <a href="http://127.0.0.1:8000/{{company.symbol}}">{{company.name}}</a><br></br>
+{%endfor%}

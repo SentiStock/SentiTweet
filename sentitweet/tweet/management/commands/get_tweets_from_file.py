@@ -25,9 +25,9 @@ class Command(BaseCommand):
 
         if options['delete']:
             self.stdout.write(self.style.NOTICE('Deleting current models...'))
-            [i.delete() for i in Tweet.objects.all()]
-            [i.delete() for i in Company.objects.all()]
-            [i.delete() for i in TwitterUser.objects.all()]
+            Tweet.objects.all().delete()
+            Company.objects.all().delete()
+            TwitterUser.objects.all().delete()
 
         # COMPANIES
         self.stdout.write(self.style.NOTICE('Reading companies...'))
@@ -42,7 +42,7 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading tweets...'))
         tweets = pd.read_csv('sentitweet/data/Tweet.csv')
-        tweets = tweets.loc[:100]
+        tweets = tweets.loc[:10000]
         tweets.rename(columns={
             'tweet_id':'id',
             'writer':'user_id',
@@ -53,15 +53,16 @@ class Command(BaseCommand):
             'like_num': 'like_number'
             }, inplace=True
         )
+        tweets.drop_duplicates(subset=["text"], inplace=True)
 
         twitter_users = tweets.iloc[:,1:2]
         twitter_users.rename(columns={'user_id':'name'}, inplace=True)
-        twitter_users.drop_duplicates()
+        twitter_users.drop_duplicates(inplace=True)
         twitter_users['id'] = [i for i in range(len(twitter_users))]
 
         tweets['user_id'] = tweets['user_id'].apply(
-            lambda x: twitter_users[twitter_users['name'] == x]['id'].values[0])
-        twitter_users['cleaned_text'] = ''
+            lambda x: twitter_users[twitter_users['name'] == x]['id'].values[0] if not twitter_users[twitter_users['name'] == x].empty else 0)
+        tweets['cleaned_text'] = ''
         
         create_from_df(TwitterUser, twitter_users)
         create_from_df(Tweet, tweets)
@@ -72,7 +73,7 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading company_tweets...'))
         company_tweets = pd.read_csv('sentitweet/data/Company_Tweet.csv')
-        company_tweets = company_tweets.loc[:100]
+        company_tweets = company_tweets.loc[:10000]
         company_tweets.rename(columns = {'ticker_symbol':'company_id'}, inplace=True)
         company_tweets['id'] = [i for i in range(len(company_tweets))]
 

@@ -1,0 +1,8 @@
+<h1>Hello this {{company.name}} as {{company.symbol}}</h1>
+
+<h3>first 50 tweets:</h3>
+{%for tweet in tweets%}
+    tweet {{tweet.id}} by
+    {{tweet.user.name}} -->
+    {{tweet.text}}<br></br>
+{%endfor%}

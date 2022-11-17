@@ -1,3 +1,5 @@
+import os
+import tweepy
 import pandas as pd
 
 from core.utils import get_sql_engine
@@ -5,7 +7,25 @@ from core.utils import get_sql_engine
 from tweet.models import HashTag, Tweet
 
 
+consumer_key = os.getenv('TWITTER_KEY')
+consumer_secret = os.getenv('TWITTER_SECRET_SECRET_KEY')
+access_token = os.getenv('TWITTER_ACCESS_TOKEN')
+access_token_secret = os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+twitter_api = tweepy.API(auth)
+
+twitter_client = tweepy.Client(
+    bearer_token=None,
+    consumer_key=consumer_key,
+    consumer_secret=consumer_secret,
+    access_token=access_token,
+    access_token_secret=access_token_secret,
+) # TODO setup client, which is 2.0
+
 def get_and_create_hashtags(tweets):
+    # TODO is not tested yet
     for tweet in tweets:
         hashtags = [j for j in [i for i in tweet.text.split() if i.startswith('#')]]
         for hashtag in hashtags:
@@ -15,6 +35,7 @@ def get_and_create_hashtags(tweets):
 
 
 def clean_tweets(tweets):
+    # TODO this is old code
     df = tweets
 
     df.drop_duplicates(subset=["id"],inplace=True)
@@ -59,5 +80,41 @@ def clean_tweets(tweets):
         return stemmer
 
 
-def get_tweets():
-    pass
+def get_tweets_by_hashtag(hashtag):
+    # TODO transfer to 2.0
+    MAX_TWEETS = 3000
+    tweets = tweepy.Cursor(
+        twitter_api.search_tweets,
+        q=f'{hashtag} -filter:retweets',
+        tweet_mode='extended'
+    ).items(MAX_TWEETS)
+
+    print(vars(tweets))
+
+    tweets_data = [[
+        tweet.id,
+        tweet.full_text,
+        tweet.lang,
+        tweet.created_at,
+        tweet.user.id,
+        tweet.user.location,
+    ] for tweet in tweets]
+
+    df = pd.DataFrame(data=tweets_data, columns=[
+        'id',
+        'text',
+        'language',
+        'post_date',
+        'user_id',
+        'user_location',
+        'geo_location'
+    ])
+
+    df.rename(columns={'ticker_symbol':'company_id'}, inplace=True)
+
+    return df
+
+def get_tweets_for_company(company):
+    hashtags = company.hashtags.all()
+    for hashtag in hashtags:
+        get_tweets_by_hashtag(hashtag)

@@ -40,6 +40,7 @@ class Tweet(PandasModelMixin):
     retweet_number = models.PositiveIntegerField()
     like_number = models.PositiveIntegerField()
 
+    # sentiment = models.IntegerField()
 
 class HashTag(models.Model):
     tweets = models.ManyToManyField(Tweet, related_name='hashtags')

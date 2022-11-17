@@ -3,6 +3,8 @@ import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
+from tweet.utils import get_tweets_by_hashtag
+
 
 class Command(BaseCommand):
 
@@ -16,7 +18,7 @@ class Command(BaseCommand):
             'Gathering tweets from twitter...'))
 
         try:
-            pass
+            get_tweets_by_hashtag('TESLA')
             # TODO code to get and store 
 
         except Exception as e:
