@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'core',
+    'tweet',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -83,20 +84,30 @@ if os.environ.get('ENV') == 'local':
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    SQLALCHEMY_DATABASE_URL = 'sqlite:////app/db.sqlite3'
 elif os.environ.get('ENV') == 'production':
+    name = os.environ.get('DATABASE_NAME'),
+    user = os.environ.get('DATABASE_USERNAME'),
+    password = os.environ.get('DATABASE_PASSWORD'),
+    host = os.environ.get('DATABASE_HOST'),
+    posrt = os.environ.get('DATABASE_PORT'),
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'USER': os.environ.get('DATABASE_USERNAME'),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-            'HOST': os.environ.get('DATABASE_HOST'),
-            'PORT': os.environ.get('DATABASE_PORT'),
+            'NAME': name,
+            'USER': user,
+            'PASSWORD': password,
+            'HOST': host,
+            'PORT': port,
             # 'OPTIONS': { # TODO I needed this previously because of ssl secuirity in mysql
             #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
             # }
         }
     }
+    SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'    
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
