@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  festiverse-backend:
+    container_name: "sentitweet"
+    build:
+      context: ..
+      dockerfile: ./devops/Dockerfile
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    expose:
+      - 8000
+    volumes:
+      - ../sentitweet/:/app
+    restart: always
