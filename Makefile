@@ -4,6 +4,10 @@ docker_compose = docker-compose -f devops/docker-compose.yml
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
 	@$(docker_compose) up -d --build
 
+.PHONY: build
+build: # Builds
+	@$(docker_compose) build
+
 .PHONY: logs
 logs: # View the logs of sentitweet activity
 	@$(docker_compose) logs -f --tail=100
