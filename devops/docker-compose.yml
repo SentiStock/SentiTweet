@@ -1,6 +1,6 @@
 version: "3.3"
 services:
-  festiverse-backend:
+  sentitweet:
     container_name: "sentitweet"
     build:
       context: ..
@@ -13,3 +13,28 @@ services:
     volumes:
       - ../sentitweet/:/app
     restart: always
+    networks:
+      - sentitweet
+
+  postgres-db-sentitweet:
+    container_name: "postgres-db-sentitweet"
+    image: postgres:14.0-alpine
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=sentitweet
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=dbsentitweet
+    networks:
+      - sentitweet
+    tty: true
+
+volumes:
+  postgres_data:
+
+networks:
+  sentitweet:
+    driver: bridge

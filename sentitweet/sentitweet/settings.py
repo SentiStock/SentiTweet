@@ -76,9 +76,17 @@ WSGI_APPLICATION = 'sentitweet.wsgi.application'
 # Database
 if os.environ.get('ENV') == 'local':
     DATABASES = {
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': BASE_DIR / 'db.sqlite3',
+        # }
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'dbsentitweet',
+            'USER': 'sentitweet',
+            'PASSWORD': '12345',
+            'HOST': 'postgres-db-sentitweet',
+            'PORT': '',
         }
     }
 elif os.environ.get('ENV') == 'production':
