@@ -86,22 +86,19 @@ if os.environ.get('ENV') == 'local':
     }
     SQLALCHEMY_DATABASE_URL = 'sqlite:////app/db.sqlite3'
 elif os.environ.get('ENV') == 'production':
-    name = os.environ.get('DATABASE_NAME'),
-    user = os.environ.get('DATABASE_USERNAME'),
-    password = os.environ.get('DATABASE_PASSWORD'),
-    host = os.environ.get('DATABASE_HOST'),
-    posrt = os.environ.get('DATABASE_PORT'),
+    database_name = os.environ.get('DATABASE_NAME')
+    user = os.environ.get('DATABASE_USERNAME')
+    password = os.environ.get('DATABASE_PASSWORD')
+    host = os.environ.get('DATABASE_HOST')
+    port = int(os.environ.get('DATABASE_PORT'))
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': name,
+            'NAME': database_name,
             'USER': user,
             'PASSWORD': password,
             'HOST': host,
             'PORT': port,
-            # 'OPTIONS': { # TODO I needed this previously because of ssl secuirity in mysql
-            #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            # }
         }
     }
     SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'    

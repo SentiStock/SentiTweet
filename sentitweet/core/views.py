@@ -19,6 +19,7 @@ def detail(request, symbol):
 
     company = companies.first()
     tweets = company.tweets.all()[:50]
+    number_of_tweets = len(company.tweets.all())
 
-    context = {'company': company, 'tweets': tweets}
+    context = {'company': company, 'tweets': tweets, 'number_of_tweets':number_of_tweets}
     return render(request, 'core/detail.html', context)

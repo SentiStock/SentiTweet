@@ -4,6 +4,9 @@ from sqlalchemy import create_engine
 from django.conf import settings
 
 
+nasdaq_api = 'https://data.nasdaq.com/api/v3/datasets/WIKI/ORB.json?api_key=ytqghVKP6zuYXw8tLwxU'
+
+
 def get_sql_engine():
     return create_engine(settings.SQLALCHEMY_DATABASE_URL, echo=False)
 
