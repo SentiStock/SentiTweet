@@ -2,8 +2,6 @@
 Interactive dashboard of analyzed Tweets correlated to stocks
 
 ## Requirements
-- python 3.10
-- pip3
 - docker
 - Make
 

@@ -1,6 +1,6 @@
 version: "3.3"
 services:
-  festiverse-backend:
+  sentitweet:
     container_name: "sentitweet"
     build:
       context: ..
@@ -13,3 +13,9 @@ services:
     volumes:
       - ../sentitweet/:/app
     restart: always
+    networks:
+      - sentitweet
+
+networks:
+  sentitweet:
+    driver: bridge

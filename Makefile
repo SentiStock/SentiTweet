@@ -1,4 +1,7 @@
-docker_compose = docker-compose -f devops/docker-compose.yml
+include ./sentitweet/.env
+# docker_compose = docker-compose -f devops/docker-compose-${ENV}.yml
+docker_compose = docker-compose -f devops/docker-compose-${ENV}.yml
+docker_db_exec = docker exec -i postgres-db-sentitweet
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
@@ -31,3 +34,11 @@ migrate: # Execute migrate command in sentitweet container
 .PHONY: makemigrations
 makemigrations: # Execute makemigrations command in sentitweet container
 	docker exec -i sentitweet python manage.py makemigrations
+
+.PHONY: db-rebuild-migrations
+db-rebuild-migrations:
+	@$(docker_db_exec) psql -U sentitweet -d dbsentitweet < devops/db/drop_and_create_schema.sql
+	@$(docker_db_exec) psql -U sentitweet -d dbsentitweet < database.bak
+
+.PHONY: db-redeploy
+db-redeploy: db-rebuild-migrations migrate
