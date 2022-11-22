@@ -89,6 +89,10 @@ WSGI_APPLICATION = 'sentitweet.wsgi.application'
 # Database
 if os.environ.get('ENV') == 'local':
     DATABASES = {
+        # 'default': {
+        #     'ENGINE': 'django.db.backends.sqlite3',
+        #     'NAME': BASE_DIR / 'db.sqlite3',
+        # }
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'dbsentitweet',
