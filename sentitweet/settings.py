@@ -101,7 +101,7 @@ if os.environ.get('ENV') == 'local':
             'PORT': '',
         }
     }
-    SQLALCHEMY_DATABASE_URL = f'postgresql://sentitweet:12345@postgres-db-sentitweet:5433/dbsentitweet'
+    SQLALCHEMY_DATABASE_URL = f'postgresql://sentitweet:12345@postgres-db-sentitweet:5432/dbsentitweet'
 elif os.environ.get('ENV') == 'production':
     database_name = os.environ.get('DATABASE_NAME')
     user = os.environ.get('DATABASE_USERNAME')

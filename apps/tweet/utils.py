@@ -2,8 +2,6 @@ import os
 import tweepy
 import pandas as pd
 
-from core.utils import get_sql_engine
-
 from tweet.models import HashTag, Tweet
 
 
@@ -24,6 +22,11 @@ twitter_client = tweepy.Client(
     access_token_secret=access_token_secret,
 ) # TODO setup client, which is 2.0
 
+
+def get_sentiment(tweets):
+    # TODO get tweet sentiment
+    pass
+
 def get_and_create_hashtags(tweets):
     # TODO is not tested yet
     for tweet in tweets:
@@ -36,7 +39,11 @@ def get_and_create_hashtags(tweets):
 
 def clean_tweets(tweets):
     # TODO this is old code
-    df = tweets
+
+    if isinstance(tweets, Tweet):
+        df = tweets.as_dataframe()
+    else:
+        df = tweets
 
     df.drop_duplicates(subset=["id"],inplace=True)
 
