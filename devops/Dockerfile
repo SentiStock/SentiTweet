@@ -16,7 +16,7 @@ RUN pip install --upgrade pip
 RUN pip install -r /app/requirements.txt
 
 # Set the working directory to /app/
-COPY ./sentitweet/ /app/
+COPY .. /app/
 WORKDIR /app/
 
 EXPOSE 8000

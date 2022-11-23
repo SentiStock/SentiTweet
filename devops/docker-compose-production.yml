@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  sentitweet:
+    container_name: "sentitweet"
+    build:
+      context: ..
+      dockerfile: ./devops/Dockerfile
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    expose:
+      - 8000
+    volumes:
+      - ../:/app
+    restart: always
