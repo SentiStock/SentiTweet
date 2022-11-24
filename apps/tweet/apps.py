@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class AppsConfig(AppConfig):
+class TweetConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps'
-    label = 'apps'
+    name = 'tweet'
+    # label = 'tweet'

@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
+import sys
 
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 load_dotenv()
 
@@ -34,8 +35,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.home',
-    'apps.authentication',
+    'stock',
+    'tweet',
+    'home',
+    'authentication',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -64,7 +67,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'sentitweet.urls'
 LOGIN_REDIRECT_URL = "home"  # Route defined in home/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in home/urls.py
-TEMPLATE_DIR = os.path.join(CORE_DIR, "sentitweet/templates")  # ROOT dir for templates
+TEMPLATE_DIR = os.path.join(BASE_DIR, "sentitweet/templates")  # ROOT dir for templates
 
 TEMPLATES = [
     {
@@ -89,10 +92,6 @@ WSGI_APPLICATION = 'sentitweet.wsgi.application'
 # Database
 if os.environ.get('ENV') == 'local':
     DATABASES = {
-        # 'default': {
-        #     'ENGINE': 'django.db.backends.sqlite3',
-        #     'NAME': BASE_DIR / 'db.sqlite3',
-        # }
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'dbsentitweet',
@@ -102,17 +101,27 @@ if os.environ.get('ENV') == 'local':
             'PORT': '',
         }
     }
+    SQLALCHEMY_DATABASE_URL = f'postgresql://sentitweet:12345@postgres-db-sentitweet:5432/dbsentitweet'
 elif os.environ.get('ENV') == 'production':
+    database_name = os.environ.get('DATABASE_NAME')
+    user = os.environ.get('DATABASE_USERNAME')
+    password = os.environ.get('DATABASE_PASSWORD')
+    host = os.environ.get('DATABASE_HOST')
+    port = int(os.environ.get('DATABASE_PORT'))
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DATABASE_NAME'),
-            'USER': os.environ.get('DATABASE_USERNAME'),
-            'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-            'HOST': os.environ.get('DATABASE_HOST'),
-            'PORT': os.environ.get('DATABASE_PORT'),
+            'NAME': database_name,
+            'USER': user,
+            'PASSWORD': password,
+            'HOST': host,
+            'PORT': port,
         }
     }
+    SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -150,12 +159,12 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ASSETS_ROOT = '/static/assets'
 
-STATIC_ROOT = os.path.join(CORE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
-    os.path.join(CORE_DIR, 'sentitweet/static'),
+    os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
 # TODO django-allauth

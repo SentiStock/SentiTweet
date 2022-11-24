@@ -11,5 +11,5 @@ services:
     expose:
       - 8000
     volumes:
-      - ../sentitweet/:/app
+      - ../:/app
     restart: always
