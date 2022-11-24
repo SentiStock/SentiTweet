@@ -33,6 +33,7 @@ def get_and_create_hashtags(tweets):
         for hashtag in hashtags:
             tag, created = HashTag.objects.get_or_create(value=hashtag)
             tag.tweets.add(tweet)
+            [tag.companies.add(i) for i in tweet.companies]
             tag.save()
 
 
