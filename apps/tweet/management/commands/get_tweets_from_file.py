@@ -47,7 +47,7 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading tweets...'))
         tweets = pd.read_csv('sentitweet/data/Tweet.csv')
-        tweets = tweets.loc[:1000]
+        tweets = tweets.loc[:10000]
         tweets.rename(columns={
             'tweet_id':'id',
             'writer':'user_id',
@@ -81,7 +81,7 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading company_tweets...'))
         company_tweets = pd.read_csv('sentitweet/data/Company_Tweet.csv')
-        company_tweets = company_tweets.loc[:1000]
+        company_tweets = company_tweets.loc[:10000]
         company_tweets.rename(columns = {'ticker_symbol':'company_id'}, inplace=True)
         company_tweets['id'] = [i for i in range(len(company_tweets))]
 

@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
         tweets = Tweet.objects.all()
         self.stdout.write(self.style.NOTICE(
-            f'There are {len(tweets)} to update'))
+            f'There are {len(tweets)} tweets to get hashtags from'))
 
         get_and_create_hashtags(Tweet.objects.all())
 
