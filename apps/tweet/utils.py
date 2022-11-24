@@ -28,7 +28,6 @@ def get_sentiment(tweets):
     pass
 
 def get_and_create_hashtags(tweets):
-    # TODO is not tested yet
     for tweet in tweets:
         hashtags = [j for j in [i for i in tweet.text.split() if i.startswith('#')]]
         for hashtag in hashtags:
