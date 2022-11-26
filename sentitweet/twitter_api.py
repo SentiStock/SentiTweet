@@ -1,46 +1,78 @@
 import os
 import tweepy
+import pandas as pd
+
+from sentitweet.utils import create_from_df
+
+from tweet.models import Tweet, TwitterUser
+from tweet.utils import get_and_create_hashtags
+
 
 bearer_token = os.getenv('TWITTER_BEARER_TOKEN')
-Client = tweepy.Client(bearer_token)
+Client = tweepy.Client(bearer_token)#, return_type=dict)
 
 
-def get_tweets_by_hashtag(hashtag):
-    MAX_TWEETS = 10
-    # tweets = tweepy.Cursor(
-    #     twitter_api.search_tweets,
-    #     q=f'{hashtag} -filter:retweets',
-    #     tweet_mode='extended'
-    # ).items(MAX_TWEETS)
+def get_tweets_by_hashtag(hashtag, MAX_TWEETS=10):
+    tweets = Client.search_recent_tweets(
+        query=f'{hashtag} new -is:retweet', 
+        expansions=['author_id', 'geo.place_id'],
+        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source'], # TODO context_annotations # TODO A lot of info!!!
+        user_fields=['created_at', 'username', 'name'],
+        since_id=None,
+        max_results=MAX_TWEETS,
+    )
 
-    response = Client.search_recent_tweets(query=f'{hashtag}', max_results=MAX_TWEETS)
-
-    print(response.data)
+    users_data = [[
+        user.id,
+        user.name,
+        user.username,
+        user.created_at,
+    ] for user in tweets.includes['users']]
 
     tweets_data = [[
         tweet.id,
-        tweet.full_text,
+        tweet.text,
         tweet.lang,
         tweet.created_at,
-        tweet.user.id,
-        tweet.user.location,
-    ] for tweet in response.data]
+        tweet.public_metrics['reply_count'],
+        tweet.public_metrics['retweet_count'],
+        tweet.public_metrics['like_count'],
+    ] for tweet in tweets.data]
 
-    df = pd.DataFrame(data=tweets_data, columns=[
+    tweets_df = pd.DataFrame(data=tweets_data, columns=[
         'id',
         'text',
         'language',
         'post_date',
-        'user_id',
-        'user_location',
-        'geo_location'
+        'comment_number',
+        'retweet_number',
+        'like_number'
     ])
 
-    df.rename(columns={'ticker_symbol':'company_id'}, inplace=True)
+    users_df = pd.DataFrame(data=users_data, columns=[
+        'id',
+        'name',
+        'username',
+        'created_at',
+    ])
 
-    return df
+    tweets_df.drop_duplicates(subset=['id'], inplace=True)
+    users_df.drop_duplicates(subset=['id'], inplace=True)
+
+    return tweets_df, users_df
 
 def get_tweets_for_company(company):
-    hashtags = company.hashtags.all()
+    hashtags = company.get_top_hashtags()
+
     for hashtag in hashtags:
-        get_tweets_by_hashtag(hashtag)
+        tweets_df, users_df = get_tweets_by_hashtag(hashtag)
+        company_tweets_df = pd.DataFrame({'tweet_id': tweets_df['id'], 'company_id': company.id})
+
+        # TODO no way of checking if the id/text already exists 
+        # TODO We can upload one by one --> should argue what is best
+        create_from_df(TwitterUser, users_df)
+        create_from_df(Tweet, tweets_df)
+        create_from_df(None, company_tweets_df, table='tweet_tweet_companies')
+
+        new_tweets = Tweets.objects.filter(id__in=list(tweets_df['id']))
+        get_and_create_hashtags(new_tweets)

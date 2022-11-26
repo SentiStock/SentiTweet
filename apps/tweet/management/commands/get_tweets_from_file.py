@@ -58,7 +58,7 @@ class Command(BaseCommand):
             'like_num': 'like_number'
             }, inplace=True
         )
-        tweets.drop_duplicates(subset=["text"], inplace=True)
+        tweets.drop_duplicates(subset=["id"], inplace=True)
 
         twitter_users = tweets.iloc[:,1:2]
         twitter_users.rename(columns={'user_id':'name'}, inplace=True)

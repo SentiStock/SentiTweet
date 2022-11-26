@@ -18,7 +18,7 @@ class Command(BaseCommand):
             'Gathering tweets from twitter...'))
 
         # try:
-        get_tweets_by_hashtag('#TSLA')
+        print(get_tweets_by_hashtag('#TSLA'))
             # TODO code to get and store 
 
         # except Exception as e:

@@ -27,10 +27,10 @@ class PandasModelMixin(models.Model):
 
 class TwitterUser(PandasModelMixin):
     name = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(null=True, blank=True)
 
 
 class Tweet(PandasModelMixin):
-    # id = models.PositiveIntegerField(primary_key=True)
     id = models.BigIntegerField(primary_key=True)
     companies = models.ManyToManyField(Company, related_name='tweets')
     user = models.ForeignKey(TwitterUser, on_delete=models.PROTECT)

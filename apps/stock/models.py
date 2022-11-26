@@ -10,6 +10,9 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+    def get_top_hashtags(self):
+        return self.hashtags.annotate(t_count=model.Count('tweets')).order_by('t_count')[:10]
+
 
 class Stock(models.Model):
     comapany = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='stocks')
