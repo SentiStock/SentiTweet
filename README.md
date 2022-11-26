@@ -1,30 +1,23 @@
 # SentiTweet
 Interactive dashboard for comprehensive analysis of Twitter tweets
 
-## Project Status
-Milestone 1 MUST HAVE
-
-Newest release - none
-
 ## Table of Contents
 - [SentiTweet](#sentitweet)
-  - [Project Status](#project-status)
   - [Table of Contents](#table-of-contents)
 - [About](#about)
-  - [Project aim](#project-aim)
+  - [Motivation](#motivation)
   - [Features](#features)
   - [Technologies](#technologies)
-  - [Project Roadmap](#project-roadmap)
-  - [Documentation](#documentation)
-  - [Example of use](#example-of-use)
+  - [Roadmap](#roadmap)
+  - [Examples of use](#examples-of-use)
     - [User story 1](#user-story-1)
     - [User story 2](#user-story-2)
 - [Getting started](#getting-started)
   - [Stories](#stories)
-    - [I want to try the app](#i-want-to-try-the-app)
+    - [I want to use the app! :D](#i-want-to-use-the-app-d)
     - [I have found a bug!](#i-have-found-a-bug)
     - [I have a question!](#i-have-a-question)
-    - [I want to share my thoughts/ provide feedback!](#i-want-to-share-my-thoughts-provide-feedback)
+    - [I want to share my idea / request new feature!](#i-want-to-share-my-idea--request-new-feature)
     - [I want to contribute!](#i-want-to-contribute)
     - [How does the project work?](#how-does-the-project-work)
   - [Usage](#usage)
@@ -35,15 +28,20 @@ Newest release - none
   - [Contributing](#contributing)
     - [Mindset](#mindset)
     - [Workflow](#workflow)
+      - [Todo stage](#todo-stage)
+      - [In progress stage](#in-progress-stage)
+      - [Done stage](#done-stage)
     - [Branching](#branching)
-    - [Issues labels](#issues-labels)
+      - [Naming convention](#naming-convention)
+    - [Issues](#issues)
       - [Labels](#labels)
     - [Coding guidelines](#coding-guidelines)
+- [Documentation](#documentation)
 
 
 # About
 
-## Project aim
+## Motivation
 We live in a world that contains an overwhelming amount of information, ambiguity, and uncertainty. It is hard to stay up-to-date with current trends and market opinions. To extract only what truly matters, one needs to have tremendous experience, excellent technical skills, and secrifice time and money to get desired insights. _That's frustrating._
 
 _And we also have been there._
@@ -63,11 +61,10 @@ That's why we have created this platform. We hope that with this tool, everyone 
 - [X] PostgreSQL 14
 - [X] Docker
 
-## Project Roadmap
-#TODO roadmap in projects
-## Documentation
-#TODO See Github Wiki
-## Example of use
+## Roadmap
+See [Projects tab](https://github.com/SentiStock/SentiTweet/projects?query=is%3Aopen?type=new&query=is:open%20sort:updated-asc) to view Kanban boards with current development progress
+
+## Examples of use
 
 ### User story 1
 
@@ -77,23 +74,26 @@ That's why we have created this platform. We hope that with this tool, everyone 
 
 ## Stories 
 
-### I want to try the app
-There are two options
-- online - vist the site
-- locally - See #usage
+### I want to use the app! :D
+You can either use it:
+- online - vist [this site]()
+- locally - read [usage](#usage)
 
 ### I have found a bug!
-Submit Issue in and label as Bug (it will be solved in next relase), if the bug is breaking add hotfix label instead
+Create an Issue in GitHub and label it as:
+- bug -> if it is casual
+- hotfix -> if it is critical
+
 ### I have a question!
-Discussions
-### I want to share my thoughts/ provide feedback!
-Discussions
+Go to [Q&A thread in Discussions tab](https://github.com/SentiStock/SentiTweet/discussions/categories/q-a) and ask us anything! We are always willing to answer :D
+### I want to share my idea / request new feature!
+Go to [Ideas thread in Discussions tab](https://github.com/SentiStock/SentiTweet/discussions/categories/ideas) and explain your idea, maybe we will include it in a future release!
 
 ### I want to contribute!
-See # contribute
+Read [Contributing guidelines]()
 
 ### How does the project work?
-See wiki for more information
+See [Documentation]() for comprehensive information
 
 ## Usage
 
@@ -102,7 +102,10 @@ See wiki for more information
 - Make
 
 ## Installation
-git clone
+There are 3 ways to download the repository:
+- zip file (not recommended)
+- https (most common)
+- ssh (recommended)
 
 ### Lanuch
 
@@ -123,40 +126,46 @@ git clone
     - To get a superuser first run ```make shell``` and then ```pyhton manage.py createsuperuser```
 
 ## Contributing
-
 #TODO see contributing.md
 
 
 ### Mindset
+Work in a way that anyone could take the work after you and progess with it further.
 
 ### Workflow
-1. Create Issue in GitHub
-2. Create branch from Issue, it will be auto linked
-   
-   name the branch ST (for things related to development with sentitweet)
 
-   Example feature/ST-32-name-of-your-issue
-3. assign project and set as todo
-4. assign yourself
-5. add labels
-6. assign milestone according to MoSCoV
-7. Add subtasks - [ ] 
-8. develop
-9. make pull request
-10. assign reviewer
-11. close pull request with comment
+#### Todo stage
+1. Create Issue on GitHub and name it concisely (it will be also the name of the branch!)
+2. Break the task into multiple subtasks by adding "- [ ]" to the description of the issue
+3. Classify the issue as [`bug`, `feature`, `documentation`, `style`, `enhacement`] by assigning appropriate label (only one!). If confused see [labels taxonomy](#labels).
+4.  Assign issue to milestone (Must have, Should have, Could have, Won't have this time)
+5. Assign issue to project name as the priority you chose in previous step
+   
+#### In progress stage
+1. Assign yourself to the issue
+2. Create new branch from Issue using development section in the right sidebar (it will allow automated workflows)
+3. Name the branch accoriding to [naming convention](#naming-convention) and class you chose in step 2. Example: `feature/ST-32-name-of-your-issue`
+4. Checkout on the branch and do the work
+
+#### Done stage
+1.  Make pull request to the DEV branch
+2.  Assign reviewer
+3.  Close pull request with comment (it will automatically close the issue and projects as Done)
    
 ### Branching
 -- `main` branch is protected you cannot directly push to it, because all merges will trigger Github Action that will build and push Container to production
 
+#### Naming convention
+\<class-of-branch>/ST-\<issue-number>-\<issue-name>
 
-- feature (clearly indicated in roadmap)
-- hotfix (on production - directly to main)
-- enhacement (visual, improvements)
-- bug (on dev, usually spotted when testing, if there is any bug in any branch besides those two should be resolved in the branch there)
-- ?docs (readme, wiki)
+Examples: 
+- `feature/ST-31-core-dashboard`
+- `hotfix/ST-52-logout-button-not-working`
+- `bug/ST-147-dark-theme-not-not-applied-to-sidebar`
 
-### Issues labels
+### Issues
+
+#### Labels
 Branch classification (assign only one)
 - `feature` -> New feature branch
 - `style` -> Improvements in visuals or code style
@@ -173,11 +182,7 @@ Closing labels - assign and close issue
 - `invalid` -> This doesn't seem right
 - `wontfix` -> This will not be worked on 
 - `duplicate` -> This issue or pull request already exists
-
-#### Labels
-Questions should be added in discussions tab, not as an issue
-
-
-
-create branch from issue
 ### Coding guidelines
+
+# Documentation
+See [Github Wiki](https://github.com/SentiStock/SentiTweet/wiki)
