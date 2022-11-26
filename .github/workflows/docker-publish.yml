@@ -22,8 +22,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+      # - name: Setup Docker buildx
+      #   uses: docker/setup-buildx-action@v2.2
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v2.1.0
@@ -43,7 +43,21 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          push: true
+          file: {context}/devops/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          registry: ${{ env.REGISTRY }}
-          repository: ${{ env.IMAGE_NAME }}
+    
+      # - name: 'Deploy to Azure Container Instances'
+      #   uses: 'azure/aci-deploy@v1'
+      #   with:
+      #     cpu: 1   #Optional
+      #     memory: 0.1   #Optional
+      #     resource-group: ${{ secrets.RESOURCE_GROUP }}
+      #     dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+      #     image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+      #     registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+      #     registry-username: ${{ secrets.REGISTRY_USERNAME }}
+      #     registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+      #     name: aci-sampleapp
+      #     location: 'west us'
