@@ -1,4 +1,4 @@
-name: Build And Publish Docker Container to GitHub Packages
+name: "Build And Publish Docker Container to GitHub Packages"
 
 # Runs on merge to main
 # but there is no "on merge event", so we use "push" event since every "merge" is a "push"
@@ -40,13 +40,13 @@ jobs:
 
       - name: Build and push Docker container image to GitHub Repository
         id: build-and-push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3.2
         with:
           context: .
-          push: true
-          file: {context}/devops/Dockerfile
+          file: ./devops/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          push: true
     
       # - name: 'Deploy to Azure Container Instances'
       #   uses: 'azure/aci-deploy@v1'
