@@ -6,6 +6,9 @@ name: "Build And Publish Docker Container to GitHub Packages"
 on:
   push:
     branches: [ "main" ]
+  
+  #allows you to run it manually from actions tab
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -15,15 +18,38 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read|write
       packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # - name: Setup Docker buildx
-      #   uses: docker/setup-buildx-action@v2.2
+      - name: Set environmental variables
+        uses: danielr1996/envsubst-action@1.0.0
+        env:
+          ENV: production
+          DEBUG: False
+
+          DJANGO_SECRET_KEY: ${{ secrets.SENTITWEET_DJANGO_SECRET_KEY }}
+          DATABASE_NAME: ${{ secrets.SENTITWEET_DATABASE_NAME }}
+          DATABASE_HOST: ${{ secrets.SENTITWEET_DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.SENTITWEET_DATABASE_PORT }}
+          DATABASE_USERNAME: ${{ secrets.SENTITWEET_DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.SENTITWEET_DATABASE_PASSWORD }}
+
+          ALLOWED_HOSTS: ${{ secrets.SENTITWEET_ALLOWED_HOSTS }}
+
+          TWITTER_API_URL: ${{ secrets.SENTITWEET_TWITTER_API_URL }}
+          TWITTER_KEY: ${{ secrets.SENTITWEET_TWITTER_KEY }}
+          TWITTER_SECRET_SECRET_KEY: ${{ secrets.SENTITWEET_TWITTER_SECRET_SECRET_KEY }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.SENTITWEET_TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.SENTITWEET_TWITTER_ACCESS_TOKEN_SECRET }}
+
+          NASDAQ_API_KEY: ${{ secrets.SENTITWEET_NASDAQ_API_KEY }}
+        with:
+          input: .env-example
+          output: .env
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v2.1.0
@@ -37,16 +63,6 @@ jobs:
         uses: docker/metadata-action@v4.1.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push Docker container image to GitHub Repository
-        id: build-and-push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./devops/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          push: true
     
       # - name: 'Deploy to Azure Container Instances'
       #   uses: 'azure/aci-deploy@v1'

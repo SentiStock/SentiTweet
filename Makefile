@@ -1,15 +1,11 @@
 include .env
-docker_compose = docker-compose -f devops/docker-compose-local.yml
+docker_compose = docker-compose -f devops/deployment-from-${ENV}.yml
 docker_web = docker exec -it sentitweet
 docker_db_exec = docker exec -i postgres-db-sentitweet
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
 	@$(docker_compose) up -d --build
-
-.PHONY: build
-build: # Builds
-	docker-compose -f devops/docker-compose-production.yml build
 
 .PHONY: logs
 logs: # View the logs of sentitweet activity

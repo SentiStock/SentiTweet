@@ -1,4 +1,4 @@
-name: "Build And Publish Docker Container to GitHub Packages"
+name: "Build And Publish Public Docker Container to GitHub Packages"
 
 # Runs on merge to main
 # but there is no "on merge event", so we use "push" event since every "merge" is a "push"
@@ -6,6 +6,9 @@ name: "Build And Publish Docker Container to GitHub Packages"
 on:
   push:
     branches: [ "main" ]
+
+  #allows you to run it manually from actions tab
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -15,15 +18,21 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read|write
       packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # - name: Setup Docker buildx
-      #   uses: docker/setup-buildx-action@v2.2
+      
+      - name: Set environmental variables
+        uses: danielr1996/envsubst-action@1.0.0
+        env:
+          ENV: remote
+          DEBUG: True
+        with:
+          input: .env-example
+          output: .env
 
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v2.1.0
@@ -47,17 +56,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
-    
-      # - name: 'Deploy to Azure Container Instances'
-      #   uses: 'azure/aci-deploy@v1'
-      #   with:
-      #     cpu: 1   #Optional
-      #     memory: 0.1   #Optional
-      #     resource-group: ${{ secrets.RESOURCE_GROUP }}
-      #     dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-      #     image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-      #     registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-      #     registry-username: ${{ secrets.REGISTRY_USERNAME }}
-      #     registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-      #     name: aci-sampleapp
-      #     location: 'west us'
