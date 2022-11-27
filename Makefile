@@ -1,3 +1,5 @@
+#File used only during development
+
 include .env
 docker_compose = docker-compose -f devops/deployment-from-${ENV}.yml
 docker_web = docker exec -it sentitweet

@@ -22,10 +22,11 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 #Environment
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 load_dotenv()
-SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+SECRET_KEY = str(os.environ['DJANGO_SECRET_KEY'])
 # DEBUG is set to False iif is False in .env otherwise it will fall back to True
-DEBUG = False if os.environ.get('DEBUG') == 'False' else True
-ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
+DEBUG = False if str(os.environ.get('DEBUG')) == 'False' else True
+if not DEBUG:
+    ALLOWED_HOSTS = str(os.environ.get('ALLOWED_HOSTS')).split(',')
 
 INSTALLED_APPS = [
     'stock',
@@ -93,7 +94,7 @@ else:
     user = os.environ.get('DATABASE_USERNAME')
     password = os.environ.get('DATABASE_PASSWORD')
     host = os.environ.get('DATABASE_HOST')
-    port = int(os.environ.get('DATABASE_PORT'))
+    port = int(str(os.environ.get('DATABASE_PORT')))
 
 DATABASES = {
     'default': {
