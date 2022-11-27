@@ -44,5 +44,5 @@ db-rebuild-migrations:
 db-redeploy: db-rebuild-migrations migrate
 
 .PHONY: install-requirements
-install: ## Execute migrate command in `kabood-web` container
+install: ## Execute migrate command in sentitweet container
 	@$(docker_web) pip install -r /app/requirements.txt
