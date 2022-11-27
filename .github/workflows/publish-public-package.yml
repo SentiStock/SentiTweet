@@ -5,7 +5,7 @@ name: "Build And Publish Public Docker Container to GitHub Packages"
 # to things work securely the main should be protected agains direct pushes, only accepts pull requests
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" , "test-workflows"]
 
   #allows you to run it manually from actions tab
   workflow_dispatch:
