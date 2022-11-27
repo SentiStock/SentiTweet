@@ -2,7 +2,7 @@ version: "3.3"
 services:
   sentitweet:
     container_name: "sentitweet"
-    image: ghcr.io/sentistock/sentitweet:main
+    image: ghcr.io/sentistock/sentitweet:latest
     ports:
       - "8000:8000"
       - "3000:3000"

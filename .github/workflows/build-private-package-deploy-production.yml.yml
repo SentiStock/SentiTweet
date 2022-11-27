@@ -1,11 +1,8 @@
-name: "Build And Publish Docker Container to GitHub Packages"
+name: "Build private package and deploy to production in Azure"
 
-# Runs on merge to main
-# but there is no "on merge event", so we use "push" event since every "merge" is a "push"
-# to things work securely the main should be protected agains direct pushes, only accepts pull requests
 on:
-  push:
-    branches: [ "main" ]
+  release:
+    types: [published]
   
   #allows you to run it manually from actions tab
   workflow_dispatch:
@@ -17,63 +14,40 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read|write
-      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set environmental variables
-        uses: danielr1996/envsubst-action@1.0.0
-        env:
-          ENV: production
-          DEBUG: False
+      - name: 'Create env file'
+        run: |
+          echo "${{ secrets.SENTITWEET_ENV_FILE_PRODUCTION }}" > .env
 
-          DJANGO_SECRET_KEY: ${{ secrets.SENTITWEET_DJANGO_SECRET_KEY }}
-          DATABASE_NAME: ${{ secrets.SENTITWEET_DATABASE_NAME }}
-          DATABASE_HOST: ${{ secrets.SENTITWEET_DATABASE_HOST }}
-          DATABASE_PORT: ${{ secrets.SENTITWEET_DATABASE_PORT }}
-          DATABASE_USERNAME: ${{ secrets.SENTITWEET_DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.SENTITWEET_DATABASE_PASSWORD }}
-
-          ALLOWED_HOSTS: ${{ secrets.SENTITWEET_ALLOWED_HOSTS }}
-
-          TWITTER_API_URL: ${{ secrets.SENTITWEET_TWITTER_API_URL }}
-          TWITTER_KEY: ${{ secrets.SENTITWEET_TWITTER_KEY }}
-          TWITTER_SECRET_SECRET_KEY: ${{ secrets.SENTITWEET_TWITTER_SECRET_SECRET_KEY }}
-          TWITTER_ACCESS_TOKEN: ${{ secrets.SENTITWEET_TWITTER_ACCESS_TOKEN }}
-          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.SENTITWEET_TWITTER_ACCESS_TOKEN_SECRET }}
-
-          NASDAQ_API_KEY: ${{ secrets.SENTITWEET_NASDAQ_API_KEY }}
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
         with:
-          input: .env-example
-          output: .env
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: 'Build and push image'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v2.1.0
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4.1.1
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-    
-      # - name: 'Deploy to Azure Container Instances'
-      #   uses: 'azure/aci-deploy@v1'
-      #   with:
-      #     cpu: 1   #Optional
-      #     memory: 0.1   #Optional
-      #     resource-group: ${{ secrets.RESOURCE_GROUP }}
-      #     dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-      #     image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-      #     registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-      #     registry-username: ${{ secrets.REGISTRY_USERNAME }}
-      #     registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-      #     name: aci-sampleapp
-      #     location: 'west us'
+          cpu: 1   #Optional
+          memory: 0.1   #Optional
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+          registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: sentitweet
+          location: 'france south'

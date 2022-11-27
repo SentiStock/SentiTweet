@@ -5,7 +5,7 @@ name: "Build And Publish Public Docker Container to GitHub Packages"
 # to things work securely the main should be protected agains direct pushes, only accepts pull requests
 on:
   push:
-    branches: [ "main" , "test-workflows"]
+    branches: [ "main"]
 
   #allows you to run it manually from actions tab
   workflow_dispatch:
@@ -32,7 +32,10 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+      
+      #It will tag with branch, lastest git tag (semver) and "lastest"
+      #ghcr.io/sentistock/sentitweet:test-workflows
+      #ghcr.io/sentistock/sentitweet:latest
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v4.1.1
