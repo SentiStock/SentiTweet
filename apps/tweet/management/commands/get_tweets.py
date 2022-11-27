@@ -3,7 +3,7 @@ import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from tweet.utils import get_tweets_by_hashtag
+from sentitweet.twitter_api import get_tweets_by_hashtag
 
 
 class Command(BaseCommand):
@@ -17,12 +17,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE(
             'Gathering tweets from twitter...'))
 
-        try:
-            get_tweets_by_hashtag('TESLA')
+        # try:
+        get_tweets_by_hashtag('#TSLA')
             # TODO code to get and store 
 
-        except Exception as e:
-            self.stdout.write(f'Something went wrong: {e}')
+        # except Exception as e:
+            # self.stdout.write(f'Something went wrong: {e}')
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully gathered tweets from twitter'))
