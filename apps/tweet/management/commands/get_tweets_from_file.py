@@ -22,6 +22,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        NUMBER_OF_TWEETS = 10000
+
         self.stdout.write(self.style.NOTICE('Gathering tweets from file...'))
 
         if options['delete']:
@@ -47,7 +49,11 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading tweets...'))
         tweets = pd.read_csv('sentitweet/data/Tweet.csv')
-        tweets = tweets.loc[:10000]
+
+        if NUMBER_OF_TWEETS:
+            tweets = tweets.loc[:NUMBER_OF_TWEETS]
+        print(f'There are {len(tweets)} tweets')
+
         tweets.rename(columns={
             'tweet_id':'id',
             'writer':'user_id',
@@ -81,7 +87,11 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading company_tweets...'))
         company_tweets = pd.read_csv('sentitweet/data/Company_Tweet.csv')
-        company_tweets = company_tweets.loc[:10000]
+
+        if NUMBER_OF_TWEETS:
+            company_tweets = company_tweets.loc[company_tweets.tweet_id.isin(list(tweets.id)),:]
+        print(f'There are {len(company_tweets)} company_tweets')
+
         company_tweets.rename(columns = {'ticker_symbol':'company_id'}, inplace=True)
         company_tweets['id'] = [i for i in range(len(company_tweets))]
 
