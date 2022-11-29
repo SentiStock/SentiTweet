@@ -17,7 +17,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE(
             'Gathering tweets from twitter...'))
 
-        update_tweets(Company.objects.first().tweets.all()[:10])
+        update_tweets(Company.objects.first().tweets.all()[:100])
 
         # number_of_search_hashtags = 5
 

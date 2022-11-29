@@ -56,8 +56,6 @@ def process_api_response(response):
     return tweets_df, users_df
 
 def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None):
-    company_tweets_df = pd.DataFrame({'tweet_id': tweets_df['id'], 'company_id': company.id})
-
     users = []
     tweets = []
     for i in range(len(users_df)):
@@ -76,15 +74,17 @@ def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None)
         tweet, created = Tweet.objects.get_or_create(
             id = tweet_from_df.id,
             post_date = tweet_from_df.post_date,
-            text = tweet_from_df.text,
-            user_id = tweet_from_df.user
         )
+        tweet.user_id = tweet_from_df.user
+        tweet.text = tweet_from_df.text
         tweet.language = tweet_from_df.language
         tweet.retweet_number = tweet_from_df.retweet_number
         tweet.comment_number = tweet_from_df.comment_number
         tweet.like_number = tweet_from_df.like_number
         tweet.source = tweet_from_df.source
-        tweet.companies.add(company)
+
+        if company:
+            tweet.companies.add(company)
         tweet.save()
         tweets.append(tweet)
 
@@ -128,8 +128,5 @@ def update_tweets(tweets):
         user_fields=['created_at', 'username', 'name'],
     )
 
-    print(response.data)
-    [print(i.data) for i in response.data]
-    tweets_df, users_df = process_api_response(tweets)
-
+    tweets_df, users_df = process_api_response(response)
     update_or_create_tweets_and_users_from_df(tweets_df, users_df)
