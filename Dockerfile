@@ -6,7 +6,7 @@ LABEL maintainer="SentiStock"
 ENV PYTHONUNBUFFERED 1
 
 # Set the working directory to /app/
-COPY .. /app/
+COPY ./ /app/
 WORKDIR /app/
 
 # Install any needed packages specified in requirements.txt

@@ -8,8 +8,6 @@ services:
       - "3000:3000"
     expose:
       - 8000
-    volumes:
-      - ../:/app
     restart: always
     networks:
       - sentitweet
