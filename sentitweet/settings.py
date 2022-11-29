@@ -19,20 +19,15 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
-load_dotenv()
-
-# Quick-start development settings - unsuitable for production
+#Environment
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+load_dotenv()
+SECRET_KEY = str(os.environ['DJANGO_SECRET_KEY'])
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['DJANGO_KEY']
-
-DEBUG = os.environ.get('DEBUG') == 'True'
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
+# DEBUG is set to False iif is False in .env otherwise it will fall back to True
+DEBUG = str(os.environ.get('DEBUG')) != 'False'
+if not DEBUG:
+    ALLOWED_HOSTS = str(os.environ.get('ALLOWED_HOSTS')).split(',')
 
 INSTALLED_APPS = [
     'stock',
@@ -88,44 +83,38 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sentitweet.wsgi.application'
 
-
 # Database
-if os.environ.get('ENV') == 'local':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'dbsentitweet',
-            'USER': 'sentitweet',
-            'PASSWORD': '12345',
-            'HOST': 'postgres-db-sentitweet',
-            'PORT': '',
-        }
-    }
-    SQLALCHEMY_DATABASE_URL = f'postgresql://sentitweet:12345@postgres-db-sentitweet:5432/dbsentitweet'
-elif os.environ.get('ENV') == 'production':
+DATABASE_ENV = str(os.environ.get('DATABASE_ENV'))
+
+if DATABASE_ENV == 'production':
     database_name = os.environ.get('DATABASE_NAME')
     user = os.environ.get('DATABASE_USERNAME')
     password = os.environ.get('DATABASE_PASSWORD')
     host = os.environ.get('DATABASE_HOST')
-    port = int(os.environ.get('DATABASE_PORT'))
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': database_name,
-            'USER': user,
-            'PASSWORD': password,
-            'HOST': host,
-            'PORT': port,
-        }
+    port = int(str(os.environ.get('DATABASE_PORT')))
+else:
+    database_name = 'dbsentitweet'
+    user = 'sentitweet'
+    password = '12345'
+    host = 'postgres-db-sentitweet'
+    port = 5432
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': database_name,
+        'USER': user,
+        'PASSWORD': password,
+        'HOST': host,
+        'PORT': port,
     }
-    SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'
-
-
-
+}
+SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
+AUTH_USER_MODEL = "authentication.CustomUser" 
+    
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -140,19 +129,15 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+# TODO django-allauth
 
-
-AUTH_USER_MODEL = "authentication.CustomUser" 
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # Static and Media files
@@ -167,4 +152,4 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
-# TODO django-allauth
+

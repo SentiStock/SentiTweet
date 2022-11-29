@@ -1,15 +1,13 @@
+#File used only during development
+
 include .env
-docker_compose = docker-compose -f devops/docker-compose-local.yml
+docker_compose = docker-compose -f devops/deployment-from-${IMAGE_SOURCE}.yml
 docker_web = docker exec -it sentitweet
 docker_db_exec = docker exec -i postgres-db-sentitweet
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
 	@$(docker_compose) up -d --build
-
-.PHONY: build
-build: # Builds
-	docker-compose -f devops/docker-compose-production.yml build
 
 .PHONY: logs
 logs: # View the logs of sentitweet activity
@@ -44,5 +42,5 @@ db-rebuild-migrations:
 db-redeploy: db-rebuild-migrations migrate
 
 .PHONY: install-requirements
-install: ## Execute migrate command in `kabood-web` container
+install: ## Execute migrate command in sentitweet container
 	@$(docker_web) pip install -r /app/requirements.txt
