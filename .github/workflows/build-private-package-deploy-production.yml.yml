@@ -35,7 +35,7 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build ./devops/Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
+          docker build . -f ./devops/Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
 
       - name: 'Deploy to Azure Container Instances'
