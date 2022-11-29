@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 import sys
-
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -96,12 +96,12 @@ else:
     database_name = 'dbsentitweet'
     user = 'sentitweet'
     password = '12345'
-    host = 'postgres-db-sentitweet'
+    host = 'postgres-db-sentitweet-timescale'
     port = 5432
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'timescale.db.backends.postgresql',
         'NAME': database_name,
         'USER': user,
         'PASSWORD': password,

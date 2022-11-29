@@ -16,14 +16,15 @@ services:
     networks:
       - sentitweet
 
-  postgres-db-sentitweet:
-    container_name: "postgres-db-sentitweet"
-    image: postgres:14.0-alpine
+  postgres-db-sentitweet-timescale:
+    container_name: "postgres-db-sentitweet-timescale"
+    image: timescale/timescaledb:latest-pg14
     restart: unless-stopped
     ports:
       - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      # - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data2/
     environment:
       - POSTGRES_USER=sentitweet
       - POSTGRES_PASSWORD=12345

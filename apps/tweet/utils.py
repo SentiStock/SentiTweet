@@ -1,6 +1,6 @@
 import os
-import pandas as pd
 
+import pandas as pd
 from tweet.models import HashTag, Tweet
 
 
@@ -11,10 +11,65 @@ def get_sentiment(tweets):
 def get_and_create_hashtags(tweets):
     for tweet in tweets:
         hashtags = [j for j in [i for i in tweet.text.split() if i.startswith('#')]]
-        for hashtag in hashtags:
-            tag, created = HashTag.objects.get_or_create(value=hashtag)
-            tag.tweets.add(tweet)
-            [tag.companies.add(i) for i in tweet.companies.all()]
+        if len(hashtags) >= 1:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[0])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 2:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[1])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 3:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[2])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 4:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[3])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 5:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[4])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 6:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[5])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 7:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[6])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 8:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[7])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 9:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[8])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
+            tag.save()
+        if len(hashtags) >= 10:
+            tag, created = HashTag.objects.get_or_create(value=hashtags[9])
+            tweet.hashtag0 = tag
+            tweet.save()
+            tag.companies.add(tweet.company)
             tag.save()
 
 

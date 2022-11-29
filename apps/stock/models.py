@@ -1,7 +1,5 @@
 from django.db import models
 
-from sentitweet.utils import get_sql_engine
-
 
 class Company(models.Model):
     name = models.CharField(max_length=255)

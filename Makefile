@@ -3,7 +3,8 @@
 include .env
 docker_compose = docker-compose -f devops/deployment-from-${IMAGE_SOURCE}.yml
 docker_web = docker exec -it sentitweet
-docker_db_exec = docker exec -i postgres-db-sentitweet
+docker_db_exec = docker exec -i postgres-db-sentitweet-timescale
+docker_db = docker exec -it postgres-db-sentitweet-timescale
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
@@ -24,6 +25,10 @@ down: # Stops containers and removes containers, networks, volumes, and images c
 .PHONY: shell
 shell: # Enter the shell of the docker where sentitweet is running
 	@$(docker_web) sh -c "export COLUMNS=`tput cols`; export LINES=`tput lines`; exec bash";
+
+.PHONY: shell-db
+shell-db: # Enter the shell of the docker where sentitweet is running
+	@$(docker_db) sh -c "export COLUMNS=`tput cols`; export LINES=`tput lines`; exec bash";
 
 .PHONY: migrate
 migrate: # Execute migrate command in sentitweet container
