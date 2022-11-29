@@ -22,12 +22,13 @@ class Company(models.Model):
             name = name.split('.')[0]
 
         filtered_hashtags = self.hashtags.filter(
-            Q(value__icontains=self.symbol)
-            #| Q(value__icontains=name)
+            # Q(value__icontains=self.symbol)
+            Q(value__icontains=name)
         ).exclude(
             Q(value__icontains=':')
             | Q(value__icontains=')')
             | Q(value__icontains='(')
+            | Q(value__icontains='"')
         )
         return filtered_hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 

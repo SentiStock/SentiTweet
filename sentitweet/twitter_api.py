@@ -11,25 +11,13 @@ bearer_token = os.getenv('TWITTER_BEARER_TOKEN')
 Client = tweepy.Client(bearer_token)#, return_type=dict)
 
 
-def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):
-    tweets = Client.search_recent_tweets(
-        query=f'{hashtag} new -is:retweet lang:en', 
-        expansions=['author_id'],
-        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source'], # TODO context_annotations # TODO A lot of info!!!
-        user_fields=['created_at', 'username', 'name'],
-        since_id=None,
-        max_results=MAX_TWEETS,
-    )
-
-    if tweets.meta['result_count'] == 0:
-        return pd.DataFrame(), pd.DataFrame()
-
+def process_api_response(response):
     users_data = [[
         user.id,
         user.name,
         user.username,
         user.created_at,
-    ] for user in tweets.includes['users']]
+    ] for user in response.includes['users']]
 
     tweets_data = [[
         tweet.id,
@@ -41,7 +29,7 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):
         tweet.public_metrics['reply_count'],
         tweet.public_metrics['retweet_count'],
         tweet.public_metrics['like_count'],
-    ] for tweet in tweets.data]
+    ] for tweet in response.data]
 
     tweets_df = pd.DataFrame(data=tweets_data, columns=[
         'id',
@@ -67,6 +55,59 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):
 
     return tweets_df, users_df
 
+def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None):
+    company_tweets_df = pd.DataFrame({'tweet_id': tweets_df['id'], 'company_id': company.id})
+
+    users = []
+    tweets = []
+    for i in range(len(users_df)):
+        user_from_df = users_df.loc[i,:]
+        twitter_user, created = TwitterUser.objects.get_or_create(
+            id = user_from_df.id
+        )
+        twitter_user.name = user_from_df.name
+        twitter_user.username = user_from_df.username
+        twitter_user.created_at = user_from_df.created_at
+        twitter_user.save()
+        users.append(twitter_user.id)
+
+    for i in range(len(tweets_df)):
+        tweet_from_df = tweets_df.loc[i,:]
+        tweet, created = Tweet.objects.get_or_create(
+            id = tweet_from_df.id,
+            post_date = tweet_from_df.post_date,
+            text = tweet_from_df.text,
+            user_id = tweet_from_df.user
+        )
+        tweet.language = tweet_from_df.language
+        tweet.retweet_number = tweet_from_df.retweet_number
+        tweet.comment_number = tweet_from_df.comment_number
+        tweet.like_number = tweet_from_df.like_number
+        tweet.source = tweet_from_df.source
+        tweet.companies.add(company)
+        tweet.save()
+        tweets.append(tweet)
+
+    get_and_create_hashtags(tweets)
+
+
+def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):
+    response = Client.search_recent_tweets(
+        query=f'{hashtag} new -is:retweet lang:en', 
+        expansions=['author_id'],
+        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source', 'entities'], # TODO context_annotations # TODO A lot of info!!!
+        user_fields=['created_at', 'username', 'name'],
+        since_id=None,
+        sort_order='relevancy',
+        max_results=MAX_TWEETS,
+    )
+
+    if response.meta['result_count'] == 0:
+        return pd.DataFrame(), pd.DataFrame()
+
+    return process_api_response(response)
+
+
 def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
     hashtags = company.get_search_hashtags(number_of_search_hashtags)
 
@@ -76,44 +117,19 @@ def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
         if tweets_df.empty:
             continue
 
-        company_tweets_df = pd.DataFrame({'tweet_id': tweets_df['id'], 'company_id': company.id})
+        update_or_create_tweets_and_users_from_df(tweets_df, users_df, company)
 
-        # TODO no way of checking if the id/text already exists 
-        # TODO We can upload one by one --> should argue what is best
-        # create_from_df(TwitterUser, users_df)
-        # create_from_df(Tweet, tweets_df)
-        # create_from_df(None, company_tweets_df, table='tweet_tweet_companies')
 
-        print(len(tweets_df))
+def update_tweets(tweets):
+    response = Client.get_tweets(
+        ids=[tweet.id for tweet in tweets],
+        expansions=['author_id'],
+        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source'],
+        user_fields=['created_at', 'username', 'name'],
+    )
 
-        users = []
-        tweets = []
-        for i in range(len(users_df)):
-            user_from_df = users_df.loc[i,:]
-            twitter_user, created = TwitterUser.objects.get_or_create(
-                id = user_from_df.id
-            )
-            twitter_user.name = user_from_df.name
-            twitter_user.username = user_from_df.username
-            twitter_user.created_at = user_from_df.created_at
-            twitter_user.save()
-            users.append(twitter_user.id)
+    print(response.data)
+    [print(i.data) for i in response.data]
+    tweets_df, users_df = process_api_response(tweets)
 
-        for i in range(len(tweets_df)):
-            tweet_from_df = tweets_df.loc[i,:]
-            tweet, created = Tweet.objects.get_or_create(
-                id = tweet_from_df.id,
-                post_date = tweet_from_df.post_date,
-                text = tweet_from_df.text,
-                user_id = tweet_from_df.user
-            )
-            tweet.language = tweet_from_df.language
-            tweet.retweet_number = tweet_from_df.retweet_number
-            tweet.comment_number = tweet_from_df.comment_number
-            tweet.like_number = tweet_from_df.like_number
-            tweet.source = tweet_from_df.source
-            tweet.companies.add(company)
-            tweet.save()
-            tweets.append(tweet)
-
-        get_and_create_hashtags(tweets)
+    update_or_create_tweets_and_users_from_df(tweets_df, users_df)
