@@ -1,7 +1,7 @@
 #File used only during development
 
 include .env
-docker_compose = docker-compose -f devops/deployment-from-${ENV}.yml
+docker_compose = docker-compose -f devops/deployment-from-${IMAGE_SOURCE}.yml
 docker_web = docker exec -it sentitweet
 docker_db_exec = docker exec -i postgres-db-sentitweet
 

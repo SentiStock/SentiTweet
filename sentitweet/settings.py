@@ -23,8 +23,9 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 load_dotenv()
 SECRET_KEY = str(os.environ['DJANGO_SECRET_KEY'])
+
 # DEBUG is set to False iif is False in .env otherwise it will fall back to True
-DEBUG = False if str(os.environ.get('DEBUG')) == 'False' else True
+DEBUG = str(os.environ.get('DEBUG')) != 'False'
 if not DEBUG:
     ALLOWED_HOSTS = str(os.environ.get('ALLOWED_HOSTS')).split(',')
 
@@ -83,18 +84,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sentitweet.wsgi.application'
 
 # Database
-if DEBUG:
-    database_name = 'dbsentitweet'
-    user = 'sentitweet'
-    password = '12345'
-    host = 'postgres-db-sentitweet'
-    port = 5432
-else:
+DATABASE_ENV = str(os.environ.get('DATABASE_ENV'))
+
+if DATABASE_ENV == 'production':
     database_name = os.environ.get('DATABASE_NAME')
     user = os.environ.get('DATABASE_USERNAME')
     password = os.environ.get('DATABASE_PASSWORD')
     host = os.environ.get('DATABASE_HOST')
     port = int(str(os.environ.get('DATABASE_PORT')))
+else:
+    database_name = 'dbsentitweet'
+    user = 'sentitweet'
+    password = '12345'
+    host = 'postgres-db-sentitweet'
+    port = 5432
 
 DATABASES = {
     'default': {
