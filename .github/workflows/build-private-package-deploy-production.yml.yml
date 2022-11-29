@@ -50,4 +50,4 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: sentitweet${{ github.sha }}
-          location: 'francecentral'
+          location: 'germanywestcentral'
