@@ -19,55 +19,55 @@ def get_and_create_hashtags(tweets):
             tag.save()
         if len(hashtags) >= 2:
             tag, created = HashTag.objects.get_or_create(value=hashtags[1])
-            tweet.hashtag0 = tag
+            tweet.hashtag1 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 3:
             tag, created = HashTag.objects.get_or_create(value=hashtags[2])
-            tweet.hashtag0 = tag
+            tweet.hashtag2 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 4:
             tag, created = HashTag.objects.get_or_create(value=hashtags[3])
-            tweet.hashtag0 = tag
+            tweet.hashtag3 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 5:
             tag, created = HashTag.objects.get_or_create(value=hashtags[4])
-            tweet.hashtag0 = tag
+            tweet.hashtag4 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 6:
             tag, created = HashTag.objects.get_or_create(value=hashtags[5])
-            tweet.hashtag0 = tag
+            tweet.hashtag5 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 7:
             tag, created = HashTag.objects.get_or_create(value=hashtags[6])
-            tweet.hashtag0 = tag
+            tweet.hashtag6 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 8:
             tag, created = HashTag.objects.get_or_create(value=hashtags[7])
-            tweet.hashtag0 = tag
+            tweet.hashtag7 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 9:
             tag, created = HashTag.objects.get_or_create(value=hashtags[8])
-            tweet.hashtag0 = tag
+            tweet.hashtag8 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
         if len(hashtags) >= 10:
             tag, created = HashTag.objects.get_or_create(value=hashtags[9])
-            tweet.hashtag0 = tag
+            tweet.hashtag9 = tag
             tweet.save()
             tag.companies.add(tweet.company)
             tag.save()
