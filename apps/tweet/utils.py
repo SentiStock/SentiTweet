@@ -1,6 +1,8 @@
 import os
 
+import nltk
 import pandas as pd
+from nltk.corpus import stopwords
 from tweet.models import HashTag, Tweet
 
 
@@ -18,52 +20,20 @@ def get_and_create_hashtags(tweets):
             tag.save()
 
 
+def clean_tweet_text(text):
+    stemmer = nltk.stem.SnowballStemmer('english', ignore_stopwords=True)
+    stop_words = list(set(stopwords.words('english')))
+    whitelist = set('abcdefghijklmnopqrstuvwxyz# ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+    clean_text = text.replace("<br>", " ")
+    clean_text = clean_text.replace("\n", " ")
+    clean_text = clean_text.encode('ascii', 'ignore').decode('ascii')
+    clean_text = ''.join(i + ' ' for i in clean_text.split() if not i.startswith('http') and not i.startswith('@'))
+    clean_text = ''.join(i + ' ' for i in [stemmer.stem(word) for word in clean_text.lower().split() if word not in stop_words])
+    return ''.join(filter(whitelist.__contains__, clean_text))
+
+
 def clean_tweets(tweets):
-    # TODO this is old code
-
-    if isinstance(tweets, Tweet):
-        df = tweets.as_dataframe()
-    else:
-        df = tweets
-
-    df.drop_duplicates(subset=["id"],inplace=True)
-
-    new_tweets = []
-
-    for index, tweet in df.iterrows():
-        stop_words = self.__get_stopwords(lang)
-        stemmer = self.__get_stemmer(lang)
-        tweet.cleaned_text = self.__clean_text(tweet.text, stop_words, stemmer)
-        new_tweets.append(list(tweet))
-
-    cleaned_df = pd.DataFrame(new_tweets, columns=[col for col in df])
-
-    # Remove empty reviews
-    cleaned_df = cleaned_df.loc[lambda x: x['text'] != '']
-
-    # Drop duplicates after cleaning
-    cleaned_df.drop_duplicates(subset=["text"],inplace=True)
-    cleaned_df.reset_index(inplace=True, drop=True)
-
-    return cleaned_df
-
-    def __clean_text(self, text, stop_words, stemmer):
-        whitelist = set('abcdefghijklmnopqrstuvwxyz# ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-        clean_text = text.replace("<br>", " ")
-        clean_text = clean_text.replace("\n", " ")
-        clean_text = clean_text.encode('ascii', 'ignore').decode('ascii')
-        clean_text = ''.join(i + ' ' for i in clean_text.split() if not i.startswith('http') and not i.startswith('@'))
-        clean_text = ''.join(i + ' ' for i in [stemmer.stem(word) for word in clean_text.lower().split() if word not in stop_words])
-        return ''.join(filter(whitelist.__contains__, clean_text))
-
-    def __get_stopwords(self, language):
-        """
-        Cobine nltk's and hotel reviews specific stopwords and returns these as a set
-        """
-        stop_words = stopwords.words(language)
-        return list(set(stop_words))
-
-    def __get_stemmer(self, language):
-        stemmer = nltk.stem.SnowballStemmer(language, ignore_stopwords=True)
-        return stemmer
-
+    for tweet in tweets:
+        tweet.cleaned_text = clean_tweet_text(tweet.text)
+        tweet.save()

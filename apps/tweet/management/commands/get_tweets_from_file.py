@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from stock.models import Company
 from tweet.models import Tweet, TwitterUser
+from tweet.utils import clean_tweet_text
 
 from sentitweet.utils import create_from_df, get_sql_engine
 
@@ -21,9 +22,13 @@ class Command(BaseCommand):
             help='When enabled, it deletes all already existing \
                 Companies, Tweets, and TwitterUsers'
         )
+        parser.add_argument('-n', '--number', type=int, help='Get the first n tweets from the files')
+
 
     def handle(self, *args, **options):
-        NUMBER_OF_TWEETS = 10000
+        NUMBER_OF_TWEETS = None
+        if options['number']:
+            NUMBER_OF_TWEETS = options['number']
 
         self.stdout.write(self.style.NOTICE('Gathering tweets from file...'))
 
@@ -77,7 +82,7 @@ class Command(BaseCommand):
             lambda x: twitter_users[twitter_users['name'] == x]['id'].values[0] 
             if not twitter_users[twitter_users['name'] == x].empty else 0
         )
-        tweets['cleaned_text'] = ''
+        tweets['cleaned_text'] = tweets['text'].apply(lambda x: clean_tweet_text(x))
 
         create_from_df(TwitterUser, twitter_users)
         create_from_df(Tweet, tweets)

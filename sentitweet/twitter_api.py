@@ -4,7 +4,7 @@ import pandas as pd
 import tweepy
 from django.db.models import Count
 from tweet.models import Tweet, TwitterUser
-from tweet.utils import get_and_create_hashtags
+from tweet.utils import clean_tweet_text, get_and_create_hashtags
 
 from sentitweet.utils import create_from_df
 
@@ -89,9 +89,14 @@ def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None)
         tweet.comment_number = tweet_from_df.comment_number
         tweet.like_number = tweet_from_df.like_number
         tweet.source = tweet_from_df.source
+        tweet.cleaned_text = clean_tweet_text(tweet_from_df.text)
+
+        print(tweet.cleaned_text)
+        # print(clean_tweet_text(tweet_from_df.text))
 
         if company:
             tweet.companies.add(company)
+
         tweet.save()
         tweets.append(tweet)
 
