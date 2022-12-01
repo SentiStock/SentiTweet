@@ -29,8 +29,5 @@ class Command(BaseCommand):
 
         find_optimal_clusters_sse(text, max_k=max_k)
 
-        # except Exception as e:
-        #     self.stdout.write(f'Something went wrong: {e}')
-
         self.stdout.write(self.style.SUCCESS(
             'Successfully created clusters, saved as: sentitweet/data/clusters_find.png'))

@@ -31,8 +31,6 @@ class Command(BaseCommand):
 
         print('Top key words for all the clusters are:')
         get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
-        # except Exception as e:
-        #     self.stdout.write(f'Something went wrong: {e}')
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully created clusters, saved as: sentitweet/data/clusters_create.png'))
