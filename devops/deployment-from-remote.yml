@@ -1,0 +1,38 @@
+version: "3.3"
+services:
+  sentitweet:
+    container_name: "sentitweet"
+    image: ghcr.io/sentistock/sentitweet:latest
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+    expose:
+      - 8000
+    volumes:
+      - ../:/app
+    restart: always
+    networks:
+      - sentitweet
+
+  postgres-db-sentitweet:
+    container_name: "postgres-db-sentitweet"
+    image: postgres:14.0-alpine
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=sentitweet
+      - POSTGRES_PASSWORD=12345
+      - POSTGRES_DB=dbsentitweet
+    networks:
+      - sentitweet
+    tty: true
+
+volumes:
+  postgres_data:
+
+networks:
+  sentitweet:
+    driver: bridge

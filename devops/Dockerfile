@@ -4,20 +4,13 @@ LABEL maintainer="SentiStock"
 
 # Set environment varibles
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_ENV dev
-
-RUN apt-get update
-
-COPY ./requirements.txt /app/requirements.txt
-
-RUN pip install --upgrade pip
-
-# Install any needed packages specified in requirements.txt
-RUN pip install -r /app/requirements.txt
 
 # Set the working directory to /app/
 COPY .. /app/
 WORKDIR /app/
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 EXPOSE 8000
 
