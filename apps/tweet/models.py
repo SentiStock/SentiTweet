@@ -1,8 +1,6 @@
 import pandas as pd
-
+from django.core import serializers
 from django.db import models
-from django.core import serializers        
-
 from stock.models import Company
 
 
@@ -37,7 +35,7 @@ class TwitterUser(PandasModelMixin):
 class Tweet(PandasModelMixin):
     # id = models.BigIntegerField(primary_key=True)
     companies = models.ManyToManyField(Company, related_name='tweets')
-    user = models.ForeignKey(TwitterUser, on_delete=models.PROTECT)
+    user = models.ForeignKey(TwitterUser, on_delete=models.PROTECT, related_name='tweets')
     post_date = models.DateTimeField()
     text = models.TextField()
     cleaned_text = models.TextField(null=True, blank=True)
@@ -49,7 +47,7 @@ class Tweet(PandasModelMixin):
     # sentiment = models.IntegerField()
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class HashTag(models.Model):

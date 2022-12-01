@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import tweepy
+from django.db.models import Count
 from tweet.models import Tweet, TwitterUser
 from tweet.utils import get_and_create_hashtags
 
@@ -45,7 +46,7 @@ def process_api_response(response):
 
     users_df = pd.DataFrame(data=users_data, columns=[
         'id',
-        'name',
+        'twitter_name',
         'username',
         'created_at',
     ])
@@ -56,25 +57,31 @@ def process_api_response(response):
     return tweets_df, users_df
 
 def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None):
-    users = []
     tweets = []
     for i in range(len(users_df)):
         user_from_df = users_df.loc[i,:]
         twitter_user, created = TwitterUser.objects.get_or_create(
             id = user_from_df.id
         )
-        twitter_user.name = user_from_df.name
+        twitter_user.name = user_from_df.twitter_name
         twitter_user.username = user_from_df.username
         twitter_user.created_at = user_from_df.created_at
         twitter_user.save()
-        users.append(twitter_user.id)
 
     for i in range(len(tweets_df)):
         tweet_from_df = tweets_df.loc[i,:]
-        tweet, created = Tweet.objects.get_or_create(
+        tweet = Tweet.objects.filter(
             id = tweet_from_df.id,
             post_date = tweet_from_df.post_date,
         )
+        if len(tweet) > 0:
+            tweet = tweet.first()
+        else:
+            tweet = Tweet.objects.create(
+                id = tweet_from_df.id,
+                post_date = tweet_from_df.post_date,
+                user_id = tweet_from_df.user
+            )
         tweet.user_id = tweet_from_df.user
         tweet.text = tweet_from_df.text
         tweet.language = tweet_from_df.language
@@ -89,6 +96,7 @@ def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None)
         tweets.append(tweet)
 
     get_and_create_hashtags(tweets)
+    TwitterUser.objects.annotate(t_count=Count('tweets')).filter(t_count=0).delete()
 
 
 def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):

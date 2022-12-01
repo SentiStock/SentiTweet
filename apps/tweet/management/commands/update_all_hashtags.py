@@ -1,8 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.conf import settings
-
-from tweet.utils import get_and_create_hashtags
+from django.core.management.base import BaseCommand
 from tweet.models import Tweet
+from tweet.utils import get_and_create_hashtags
 
 
 class Command(BaseCommand):

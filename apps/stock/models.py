@@ -22,8 +22,7 @@ class Company(models.Model):
             name = name.split('.')[0]
 
         filtered_hashtags = self.hashtags.filter(
-            # Q(value__icontains=self.symbol)
-            Q(value__icontains=name)
+            value__icontains=name
         ).exclude(
             Q(value__icontains=':')
             | Q(value__icontains=')')

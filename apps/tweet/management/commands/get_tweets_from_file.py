@@ -1,15 +1,16 @@
 import os
 import time
 from datetime import datetime
+
 import pandas as pd
-
-from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.utils import timezone
-
 from stock.models import Company
-from sentitweet.utils import get_sql_engine, create_from_df
 from tweet.models import Tweet, TwitterUser
+
+from sentitweet.utils import create_from_df, get_sql_engine
+
 
 class Command(BaseCommand):
 

@@ -17,17 +17,17 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE(
             'Gathering tweets from twitter...'))
 
-        update_tweets(Company.objects.first().tweets.all()[:100])
 
-        # number_of_search_hashtags = 5
+        number_of_search_hashtags = 5
 
-        # for company in Company.objects.all():
-        #     print(f'gathering {company}')
-        #     print([(i.value, i.tweets.count()) for i in company.get_search_hashtags(number_of_search_hashtags)])
-        #     get_or_update_tweets_for_company(company, number_of_search_hashtags)
+        for company in Company.objects.all():
+            print(f'gathering {company}')
+            print([(i.value, i.tweets.count()) for i in company.get_search_hashtags(number_of_search_hashtags)])
 
-        # except Exception as e:
-            # self.stdout.write(f'Something went wrong: {e}')
+            try:
+                get_or_update_tweets_for_company(company, number_of_search_hashtags)
+            except Exception as e:
+                self.stdout.write(f'Something went wrong: {e}')
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully gathered tweets from twitter'))
