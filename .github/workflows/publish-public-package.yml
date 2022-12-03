@@ -1,0 +1,60 @@
+name: "Build And Publish Public Docker Container to GitHub Packages"
+
+# Runs on merge to main
+# but there is no "on merge event", so we use "push" event since every "merge" is a "push"
+# to things work securely the main should be protected agains direct pushes, only accepts pull requests
+on:
+  push:
+    branches: [ "main"]
+
+  #allows you to run it manually from actions tab
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Create env file
+        run: |
+          echo "${{ secrets.SENTITWEET_ENV_FILE_DEAFULT }}" > .env
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      #It will tag with branch, lastest git tag (semver) and "lastest"
+      #ghcr.io/sentistock/sentitweet:test-workflows
+      #ghcr.io/sentistock/sentitweet:latest
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4.1.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+          flavor: |
+            latest=true
+
+      - name: Build and push Docker container image to GitHub Repository
+        id: build-and-push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./devops/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
