@@ -7,7 +7,7 @@ docker_db_exec = docker exec -i postgres-db-sentitweet
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service.
-	@$(docker_compose) up -d --build
+	@$(docker_compose) up -d --build; docker images -q |xargs docker rmi;
 
 .PHONY: logs
 logs: # View the logs of sentitweet activity

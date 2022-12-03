@@ -91,9 +91,6 @@ def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None)
         tweet.source = tweet_from_df.source
         tweet.cleaned_text = clean_tweet_text(tweet_from_df.text)
 
-        print(tweet.cleaned_text)
-        # print(clean_tweet_text(tweet_from_df.text))
-
         if company:
             tweet.companies.add(company)
 

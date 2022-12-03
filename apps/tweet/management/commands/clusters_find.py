@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from tweet.models import Tweet
-from tweet.utils import find_optimal_clusters_sse, get_vectorizer
+from tweet.utils import (find_optimal_clusters_silh_score,
+                         find_optimal_clusters_sse, get_vectorizer)
 
 
 class Command(BaseCommand):
@@ -9,7 +10,7 @@ class Command(BaseCommand):
     help = "Find best number of clusters"
 
     def add_arguments(self, parser):
-        parser.add_argument('-n', '--number', type=int, help='Up to number of clusters to try')
+        parser.add_argument('number', type=int, help='Up to number of clusters to try')
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.NOTICE(
@@ -20,14 +21,16 @@ class Command(BaseCommand):
             max_k=options['number']
 
         tweets = Tweet.as_dataframe()
+        tweets.drop_duplicates(subset=["cleaned_text"], inplace=True)
+        tweets.reset_index(inplace=True, drop=True)
         print(f'Creating clusters for {len(tweets)} tweets')
 
-        # TODO do we want to drop duplicates on cleaned text?
         tfidf = get_vectorizer()
         tfidf.fit(tweets.cleaned_text)
         text = tfidf.transform(tweets.cleaned_text)
 
-        find_optimal_clusters_sse(text, max_k=max_k)
+        # find_optimal_clusters_sse(text, max_k=max_k)
+        print(find_optimal_clusters_silh_score(text, max_k))
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully created clusters, saved as: sentitweet/data/clusters_find.png'))

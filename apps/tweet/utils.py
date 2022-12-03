@@ -10,6 +10,7 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.manifold import TSNE
+from sklearn.metrics import silhouette_score
 from tweet.models import HashTag, Tweet
 
 
@@ -56,14 +57,36 @@ def get_vectorizer():
     return tfidf
 
 
+def find_optimal_clusters_silh_score(text, max_k, plot=False):
+    iters = range(2, max_k+1, 1)
+    
+    scores = {}
+    for k in iters:
+        model = MiniBatchKMeans(n_clusters=k, init_size=1024, batch_size=2048, random_state=20).fit(text)
+        scores[k] = silhouette_score(text, model.labels_, metric='euclidean')
+
+    if plot:
+        f, ax = plt.subplots(1, 1)
+        ax.plot(iters, scores.values(), marker='o')
+        ax.set_xlabel('Cluster Centers')
+        ax.set_xticks(iters)
+        ax.set_xticklabels(iters)
+        ax.set_ylabel('Silhouette Score')
+        ax.set_title('Silhouette Score by Cluster Center Plot')
+        plt.savefig('sentitweet/data/clusters_find.png')
+
+    return max(scores, key=scores.get)
+
+
 def find_optimal_clusters_sse(text, max_k):
     iters = range(2, max_k+1, 1)
     
     sse = []
     for k in iters:
-        sse.append(MiniBatchKMeans(n_clusters=k, init_size=1024, batch_size=2048, random_state=20).fit(text).inertia_)
+        model = MiniBatchKMeans(n_clusters=k, init_size=1024, batch_size=2048, random_state=20).fit(text)
         print('Fit {} clusters'.format(k))
-        
+        sse.append(model.inertia_)
+
     f, ax = plt.subplots(1, 1)
     ax.plot(iters, sse, marker='o')
     ax.set_xlabel('Cluster Centers')
@@ -72,22 +95,43 @@ def find_optimal_clusters_sse(text, max_k):
     ax.set_ylabel('SSE')
     ax.set_title('SSE by Cluster Center Plot')
     plt.savefig('sentitweet/data/clusters_find.png')
-    # plt.show()
 
 
-def create_clusters(text, n_clusters):
-    clusters = MiniBatchKMeans(n_clusters=n_clusters, init_size=1024, batch_size=2048, random_state=20).fit_predict(text)
+def create_model(text, n_clusters):
+    model = MiniBatchKMeans(n_clusters=n_clusters, init_size=1024, batch_size=2048, random_state=20)
+    model = model.fit(text)
+    return model
+
+def model_predict(model, text):
+    clusters = model.predict(text)
     return clusters
+
+def get_most_repr_tweets(model, tweets, text, number_of_top_tweets=3):
+    centers = model.cluster_centers_
+    text = text.toarray()
+    final = [['', np.inf] for i in range(len(centers))]
+
+    distance = []
+
+    for i in range(len(tweets)):
+        tweet = tweets.loc[i,:]
+        dist = np.linalg.norm(centers[tweet.cluster], text[i][0])
+        distance.append(dist)
+
+    tweets['dist'] = distance
+
+    groups = tweets.sort_values('dist', ascending=True).groupby('cluster').head(number_of_top_tweets)
+    return groups
 
 
 def plot_clusters(data, labels):
     max_label = max(labels)
-    max_items = np.random.choice(range(data.shape[0]), size=3000, replace=False)
+    max_items = np.random.choice(range(data.shape[0]), size=int(len(labels)/5), replace=False)
     
     pca = PCA(n_components=2).fit_transform(data[max_items,:].todense())
     tsne = TSNE().fit_transform(PCA(n_components=50).fit_transform(data[max_items,:].todense()))
     
-    idx = np.random.choice(range(pca.shape[0]), size=300, replace=False)
+    idx = np.random.choice(range(pca.shape[0]), size=int(len(labels)/50), replace=False)
     label_subset = labels[max_items]
     label_subset = [cm.hsv(i/max_label) for i in label_subset[idx]]
     
@@ -104,12 +148,35 @@ def plot_clusters(data, labels):
 
 def get_top_keywords(data, clusters, labels, n_terms):
     df = pd.DataFrame(data.todense()).groupby(clusters).mean()
+
+    key_words = {}
     for i,r in df.iterrows():
-        print('\nCluster {}'.format(i))
-        print(','.join([labels[t] for t in np.argsort(r)[-n_terms:]]))
+        key_words[i] = [labels[t] for t in np.argsort(r)[-n_terms:]]
+
+    return key_words
 
 
-def cluster(df):
-    find_optimal_clusters_sse(text, 20)
-    plot_tsne_pca(text, clusters)
-    get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
+def cluster_tweets(tweets, max_k=10):
+    if not isinstance(tweets, pd.DataFrame):
+        tweets = Tweet.as_dataframe(queryset=tweets)
+
+    if len(tweets) == 0:
+        raise Exception(f'There are no tweets in this queryset...')
+        
+    tweets.drop_duplicates(subset=["cleaned_text"], inplace=True)
+    tweets.reset_index(inplace=True, drop=True)
+
+    tfidf = get_vectorizer()
+    tfidf.fit(tweets.cleaned_text)
+    text = tfidf.transform(tweets.cleaned_text)
+
+    number_of_clusters = find_optimal_clusters_silh_score(text, max_k=max_k)
+
+    model = create_model(text, number_of_clusters)
+    clusters = model_predict(model, text)
+    tweets['cluster'] = clusters
+
+    best_tweets = get_most_repr_tweets(model, tweets, text)
+    top_words = get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
+
+    return best_tweets, top_words
