@@ -1,8 +1,8 @@
 name: "Build And Publish Public Docker Container to GitHub Packages"
 
 # This Action runs every time a branch is merged to main
-# - there is no "on merge event", so we use "push" event since every "merge" is also a "push"
-# Tip: to assure that work is secure the main should be protected agains direct pushes and only accept pull requests
+# Note: There is no "on merge event", so we use "push" event since every "merge" is also a "push"
+# Tip: To assure that work is secure the main should be protected agains direct pushes and only accept pull requests
 on:
   push:
     branches: [ "main"]

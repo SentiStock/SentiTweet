@@ -1,10 +1,11 @@
 name: "Build private package and deploy to production in Azure"
 
+# This Action runs every time a new release is published 
 on:
   release:
     types: [published]
   
-  #allows you to run it manually from actions tab
+  #Allows you to run it manually from Actions tab in GitHub repo
   workflow_dispatch:
 
 env:
