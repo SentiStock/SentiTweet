@@ -1,7 +1,7 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
--- create rds admin user en postgres admin
+-- create rds admin user in postgres admin
 create user rdsadmin;
 create user postgres;
 
