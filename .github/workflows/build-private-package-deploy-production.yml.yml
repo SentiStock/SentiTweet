@@ -1,10 +1,11 @@
 name: "Build private package and deploy to production in Azure"
 
+# This Action runs every time a new release is published 
 on:
   release:
     types: [published]
   
-  #allows you to run it manually from actions tab
+  #Allows you to run it manually from Actions tab in GitHub repo
   workflow_dispatch:
 
 env:
@@ -35,19 +36,19 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build ./devops -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
 
       - name: 'Deploy to Azure Container Instances'
         uses: 'azure/aci-deploy@v1'
         with:
-          cpu: 1   #Optional
-          memory: 0.1   #Optional
+          cpu: 2   #Optional
+          memory: 4   #Optional
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/sentitweet:${{ github.sha }}
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          name: sentitweet
-          location: 'france south'
+          name: sentitweet${{ github.sha }}
+          location: 'germanywestcentral'

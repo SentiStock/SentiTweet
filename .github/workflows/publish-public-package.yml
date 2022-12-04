@@ -1,13 +1,13 @@
 name: "Build And Publish Public Docker Container to GitHub Packages"
 
-# Runs on merge to main
-# but there is no "on merge event", so we use "push" event since every "merge" is a "push"
-# to things work securely the main should be protected agains direct pushes, only accepts pull requests
+# This Action runs every time a branch is merged to main
+# Note: There is no "on merge event", so we use "push" event since every "merge" is also a "push"
+# Tip: To assure that work is secure the main should be protected agains direct pushes and only accept pull requests
 on:
   push:
     branches: [ "main"]
 
-  #allows you to run it manually from actions tab
+  #Allows you to run it manually from Actions tab in GitHub repo
   workflow_dispatch:
 
 env:
@@ -33,9 +33,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      #It will tag with branch, lastest git tag (semver) and "lastest"
-      #ghcr.io/sentistock/sentitweet:test-workflows
-      #ghcr.io/sentistock/sentitweet:latest
+      #It will tag the container with 
+      # 1. branch name (ghcr.io/sentistock/sentitweet:main)
+      # 2. version tag according to Semver guidelines
+      # 3. "latest" (ghcr.io/sentistock/sentitweet:latest)
+      # 4. unique sha
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v4.1.1
@@ -54,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./devops/Dockerfile
+          file: ./Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true

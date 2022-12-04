@@ -20,7 +20,7 @@ nltk.download('stopwords')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps')) #for quick searching 
 
 #Environment
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -149,7 +149,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ASSETS_ROOT = '/static/assets'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
@@ -157,7 +157,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
-# CRONJABS
+# CRONJOBS
 CRONJOBS = [
     # Everyday at 02:00 we fetch new tweets from twitter for every company
     ('0 2 * * *', 'sentitweet.cron.fetch_new_tweets'),

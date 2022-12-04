@@ -12,15 +12,15 @@ RUN apt-get update
 RUN apt-get -y install cron
 
 # Set the working directory to /app/
-COPY .. /app/
+COPY . /app/
 WORKDIR /app/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-EXPOSE 8000
+EXPOSE 80
 
 # Add our python cronjobs to machine cronjobs
 # Start cron
 # Run the server
-CMD python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:8000 && gunicorn --bind 0.0.0.0:8000 sentitweet.backend.wsgi
+CMD python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:80 && gunicorn --bind 0.0.0.0:80 sentitweet.backend.wsgi
