@@ -1,15 +1,17 @@
 import os
 import time
 from datetime import datetime
+
 import pandas as pd
-
-from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.utils import timezone
-
 from stock.models import Company
-from sentitweet.utils import get_sql_engine, create_from_df
 from tweet.models import Tweet, TwitterUser
+from tweet.utils import clean_tweet_text
+
+from sentitweet.utils import create_from_df, get_sql_engine
+
 
 class Command(BaseCommand):
 
@@ -20,8 +22,14 @@ class Command(BaseCommand):
             help='When enabled, it deletes all already existing \
                 Companies, Tweets, and TwitterUsers'
         )
+        parser.add_argument('-n', '--number', type=int, help='Get the first n tweets from the files')
+
 
     def handle(self, *args, **options):
+        NUMBER_OF_TWEETS = None
+        if options['number']:
+            NUMBER_OF_TWEETS = options['number']
+
         self.stdout.write(self.style.NOTICE('Gathering tweets from file...'))
 
         if options['delete']:
@@ -47,7 +55,11 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading tweets...'))
         tweets = pd.read_csv('sentitweet/data/Tweet.csv')
-        tweets = tweets.loc[:10000]
+
+        if NUMBER_OF_TWEETS:
+            tweets = tweets.loc[:NUMBER_OF_TWEETS]
+        print(f'There are {len(tweets)} tweets')
+
         tweets.rename(columns={
             'tweet_id':'id',
             'writer':'user_id',
@@ -58,7 +70,7 @@ class Command(BaseCommand):
             'like_num': 'like_number'
             }, inplace=True
         )
-        tweets.drop_duplicates(subset=["text"], inplace=True)
+        tweets.drop_duplicates(subset=["id"], inplace=True)
 
         twitter_users = tweets.iloc[:,1:2]
         twitter_users.rename(columns={'user_id':'name'}, inplace=True)
@@ -70,7 +82,7 @@ class Command(BaseCommand):
             lambda x: twitter_users[twitter_users['name'] == x]['id'].values[0] 
             if not twitter_users[twitter_users['name'] == x].empty else 0
         )
-        tweets['cleaned_text'] = ''
+        tweets['cleaned_text'] = tweets['text'].apply(lambda x: clean_tweet_text(x))
 
         create_from_df(TwitterUser, twitter_users)
         create_from_df(Tweet, tweets)
@@ -81,7 +93,11 @@ class Command(BaseCommand):
         start = time.time()
         self.stdout.write(self.style.NOTICE('Reading company_tweets...'))
         company_tweets = pd.read_csv('sentitweet/data/Company_Tweet.csv')
-        company_tweets = company_tweets.loc[:10000]
+
+        if NUMBER_OF_TWEETS:
+            company_tweets = company_tweets.loc[company_tweets.tweet_id.isin(list(tweets.id)),:]
+        print(f'There are {len(company_tweets)} company_tweets')
+
         company_tweets.rename(columns = {'ticker_symbol':'company_id'}, inplace=True)
         company_tweets['id'] = [i for i in range(len(company_tweets))]
 
