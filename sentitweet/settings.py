@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_crontab',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -155,4 +157,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
-
+# CRONJABS
+CRONJOBS = [
+    # Everyday at 02:00 we fetch new tweets from twitter for every company
+    ('0 2 * * *', 'sentitweet.cron.fetch_new_tweets'),
+]

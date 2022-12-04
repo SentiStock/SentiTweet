@@ -5,6 +5,12 @@ LABEL maintainer="SentiStock"
 # Set environment varibles
 ENV PYTHONUNBUFFERED 1
 
+# Update ap-get
+RUN apt-get update
+
+# Install cron for running cronjobs
+RUN apt-get -y install cron
+
 # Set the working directory to /app/
 COPY .. /app/
 WORKDIR /app/
@@ -14,4 +20,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 EXPOSE 8000
 
-CMD python manage.py runserver 0.0.0.0:8000 && gunicorn --bind 0.0.0.0:8000 sentitweet.backend.wsgi
+# Add our python cronjobs to machine cronjobs
+# Start cron
+# Run the server
+CMD python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:8000 && gunicorn --bind 0.0.0.0:8000 sentitweet.backend.wsgi
