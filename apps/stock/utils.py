@@ -1,5 +1,6 @@
-from django.db.models import Q
+from django.db.models import Count, Q
 from stock.models import Company
+from tweet.models import HashTag, Set
 
 
 def get_company_by_symbol_or_name(symbol_or_name):
@@ -18,3 +19,12 @@ def get_company_by_symbol_or_name(symbol_or_name):
         return company_filter.first()
 
     return None
+
+
+def get_relevent_model_context():
+    companies = Company.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
+    hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
+    sets = Set.objects.all()#.order_by('followers')
+
+    return {'sets': sets, 'companies': companies, 'hashtags': hashtags}
+

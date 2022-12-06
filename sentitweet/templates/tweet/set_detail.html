@@ -23,25 +23,26 @@
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h2>{{hashtag.value}}</h2>
+                                            <h2>{{set.name}}</h2>
+                                            <h2>by: {{set.creator}}</h2>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h3>Tweet#: {{hashtag.tweets.all|length}}</h3>
-                                            <h3>Contributers#: {{hashtag.contributers.all|length}}</h3>
-                                            <h3>Followers#: {{hashtag.favorites.all|length}}</h3>
+                                            <h3>Hashtag#: {{set.hashtags.all|length}}</h3>
+                                            <h3>Contributers#: {{set.contributers.all|length}}</h3>
+                                            <h3>Followers#: {{set.favorites.all|length}}</h3>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h4>Connected companies</h4>
-                                            {% for company in hashtag.companies.all %}
-                                                {{company}}
+                                            <h4>Hashtags:</h4>
+                                            {% for hashtag in set.hashtags.all %}
+                                                {{hashtag}}
                                             {% endfor %}
                                         </div>
                                     </div>

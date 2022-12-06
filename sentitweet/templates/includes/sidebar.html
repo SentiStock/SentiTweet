@@ -47,8 +47,10 @@
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span><span
                             class="pcoded-mtext">Companies</span></a>
                     <ul class="pcoded-submenu">
+                        <li class=""><a href="/companies/" class="">All Companies</a></li>
+                        <hr/>
                         {% for company in companies|slice:':10' %}
-                            <li class=""><a href="/company/{{company.symbol}}/" class="">{{company.name}}</a></li>
+                            <li class=""><a href="/companies/{{company.symbol}}/" class="">{{company.name}}</a></li>
                         {% endfor %}
                     </ul>
                 </li>
@@ -57,23 +59,55 @@
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-hash"></i></span><span
                             class="pcoded-mtext">Hashtags</span></a>
                     <ul class="pcoded-submenu">
+                        <li class=""><a href="/companies/" class="">All Hashtags</a></li>
+                        <hr/>
                         {% for hashtag in hashtags|slice:':10' %}
-                            <li class=""><a href="/tweet/hashtag/{{hashtag.clean_value}}/" class="">{{hashtag.value}}</a></li>
+                            <li class=""><a href="/hashtags/{{hashtag.clean_value}}/" class="">{{hashtag.value}}</a></li>
                         {% endfor %}
                     </ul>
                 </li>
-                <li data-username="favorites mine"
+                <li data-username="favorites mine sets"
                     class="nav-item pcoded-hasmenu ">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-star"></i></span><span
                             class="pcoded-mtext">Favorites</span></a>
                     <ul class="pcoded-submenu">
+                        <li class=""><a href="/companies/" class="">All Favorites</a></li>
+                        <hr/>
+                        {% regroup user.favorites.all by favorite_ct as favorites_grouped %}
+                        {% for favorite_group in favorites_grouped %}
+                            {% if forloop.counter0 != 0 %}
+                                {% if favorite_group.list|length > 0 %}
+                                    <hr/>
+                                {% endif %}
+                            {% endif %}
+                            {% for favorite in favorite_group.list %}
+                                {% if favorite.favorite_ct.model == 'company' %}
+                                    <li class=""><a href="/companies/{{favorite.favorite.symbol}}/" class="">
+                                        <i class="feather icon-bar-chart-2"></i> {{favorite.favorite.name}}</a>
+                                    </li>
+                                {% elif favorite.favorite_ct.model == 'set' %}
+                                    <li class=""><a href="/sets/{{favorite.favorite.pk}}/" class="">
+                                        <i class="feather icon-slack"></i> {{favorite.favorite.name}}</a>
+                                    </li>
+                                {% elif favorite.favorite_ct.model == 'hashtag' %}
+                                    <li class=""><a href="/hashtags/{{favorite.favorite.clean_value}}/" class="">
+                                        <i class="feather icon-hash"></i> {{favorite.favorite.clean_value}}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
                     </ul>
                 </li>
-                <li data-username="mine sets"
+                <li data-username="mine my sets"
                     class="nav-item pcoded-hasmenu ">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-slack"></i></span><span
                             class="pcoded-mtext">My Sets</span></a>
                     <ul class="pcoded-submenu">
+                        <li class=""><a href="/companies/" class="">All Sets</a></li>
+                        <hr/>
+                        {% for set in user.sets.all %}
+                            <li class=""><a href="/sets/{{set.pk}}/" class="">{{set.name}}</a></li>
+                        {% endfor %}
                     </ul>
                 </li>
                 <li data-username="dashboard custom" 

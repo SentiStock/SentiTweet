@@ -1,13 +1,31 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
 from stock.models import Company
-from stock.utils import get_company_by_symbol_or_name
+from stock.utils import get_company_by_symbol_or_name, get_relevent_model_context
 from tweet.models import HashTag
 
 
-def company(request, company_symbol_or_name):
+@login_required(login_url="/login/")
+def company(request):
+    companies = Company.objects.all()
+    hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
+    
+    try:
+        pass
+    except:
+        html_template = loader.get_template('home/page-500.html')
+        return HttpResponse(html_template.render({}, request))
+
+    context = get_relevent_model_context()
+
+    return render(request, 'stock/companies.html', context)
+
+
+@login_required(login_url="/login/")
+def company_detail(request, company_symbol_or_name):
     companies = Company.objects.all()
     hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
 
@@ -22,5 +40,7 @@ def company(request, company_symbol_or_name):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render({}, request))
 
-    context = {'company': company, 'companies': companies, 'hashtags': hashtags}
+    context = get_relevent_model_context()
+    context['company'] = company
+
     return render(request, 'stock/detail.html', context)

@@ -24,15 +24,21 @@
                     <ul class="dropdown-menu" id="searchAllDropdown">
                         <input class="form-control" type="text" placeholder="Search..." id="searchAllInput" onkeyup="filterSearchAll()">
                         {% for company in companies %}
-                            <li><a class="dropdown-item" href="/company/{{company.symbol}}/">
+                            <li><a class="dropdown-item" href="/companies/{{company.symbol}}/">
                                 <span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span><span
                                 class="pcoded-mtext">{{company.name}}</span>
                             </a></li>
                         {% endfor %}
                         {% for hashtag in hashtags %}
-                            <li><a class="dropdown-item" href="/tweet/hashtag/{{hashtag.clean_value}}/">
+                            <li><a class="dropdown-item" href="/hashtags/{{hashtag.clean_value}}/">
                                 <span class="pcoded-micon"><i class="feather icon-hash"></i></span><span
                                 class="pcoded-mtext">{{hashtag.clean_value}}</span>
+                            </a></li>
+                        {% endfor %}
+                        {% for set in sets %}
+                            <li><a class="dropdown-item" href="/sets/{{set.id}}/">
+                                <span class="pcoded-micon"><i class="feather icon-slack"></i></span><span
+                                class="pcoded-mtext">{{set.name}}</span>
                             </a></li>
                         {% endfor %}
                     </ul>

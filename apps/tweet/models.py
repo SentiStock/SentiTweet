@@ -1,7 +1,7 @@
 import pandas as pd
+from authentication.models import CustomUser, FavoritesModelMixin
 from django.core import serializers
 from django.db import models
-from stock.models import Company
 
 
 class PandasModelMixin(models.Model):
@@ -23,6 +23,7 @@ class PandasModelMixin(models.Model):
     class Meta:
         abstract = True
 
+
 class TwitterUser(PandasModelMixin):
     name = models.CharField(max_length=255, blank=True, null=True)
     username = models.CharField(max_length=255, blank=True, null=True)
@@ -33,8 +34,7 @@ class TwitterUser(PandasModelMixin):
 
 
 class Tweet(PandasModelMixin):
-    # id = models.BigIntegerField(primary_key=True)
-    companies = models.ManyToManyField(Company, related_name='tweets')
+    companies = models.ManyToManyField('stock.Company', related_name='tweets')
     user = models.ForeignKey(TwitterUser, on_delete=models.PROTECT, related_name='tweets')
     post_date = models.DateTimeField()
     text = models.TextField()
@@ -50,15 +50,46 @@ class Tweet(PandasModelMixin):
         return str(self.id)
 
 
-class HashTag(models.Model):
+class HashTag(FavoritesModelMixin):
     tweets = models.ManyToManyField(Tweet, related_name='hashtags')
-    companies = models.ManyToManyField(Company, related_name='hashtags')
+    companies = models.ManyToManyField('stock.Company', related_name='hashtags')
     value = models.CharField(max_length=255)
 
     @property
     def clean_value(self):
         return self.value[1:]
 
+    @property
+    def contributers(self):
+        return TwitterUser.objects.filter(
+            id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
+        )
+
     def __str__(self):
         return self.value
 
+
+class Set(FavoritesModelMixin):
+    name = models.CharField(max_length=255)
+    creator = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='sets')
+    hashtags = models.ManyToManyField(HashTag, related_name='sets')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    MODE_CHOICES = (
+        ('private', 'PRIVATE'),
+        ('public', 'PUBLIC'),
+    )
+    mode = models.CharField(
+        max_length = 20,
+        choices = MODE_CHOICES,
+        default = 'private'
+    )
+
+    @property
+    def contributers(self):
+        tweets = set(self.hashtags.values_list('tweets', flat=True).distinct())
+        twitter_user_ids = set(Tweet.objects.filter(id__in=tweets).values_list('user_id', flat=True).distinct())
+        return TwitterUser.objects.filter(id__in=twitter_user_ids)
+
+    def __str__(self):
+        return self.name

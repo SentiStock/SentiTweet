@@ -1,6 +1,7 @@
 from django.urls import path
-from stock.views import company
+from stock.views import company, company_detail
 
 urlpatterns = [
-	path('<str:company_symbol_or_name>/', company, name='comapny'),
+	path('companies/', company, name='comapny'),
+	path('companies/<str:company_symbol_or_name>/', company_detail, name='comapany_detail'),
 ]

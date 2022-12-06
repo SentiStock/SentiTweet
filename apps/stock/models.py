@@ -1,10 +1,15 @@
+import datetime
+
+from authentication.models import FavoritesModelMixin
 from django.db import models
 from django.db.models import Count, Q
+from django.utils import timezone
+from tweet import models as tweet_models
 
 from sentitweet.utils import get_sql_engine
 
 
-class Company(models.Model):
+class Company(FavoritesModelMixin):
     name = models.CharField(max_length=255)
     symbol = models.CharField(max_length=31)
 
@@ -12,9 +17,6 @@ class Company(models.Model):
         return self.name
 
     def get_search_hashtags(self, top=10):
-        # TODO check if this is the right approach
-        # TODO we could check if the word stock is in the hashtag + other keywords
-
         name = self.search_name
 
         filtered_hashtags = self.hashtags.filter(
@@ -33,6 +35,20 @@ class Company(models.Model):
     @property
     def search_name(self):
         return self.name.split(' ')[0].split('.')[0]
+
+    @property
+    def newest_tweet(self):
+        return self.tweets.order_by('-post_date').first()
+
+    @property
+    def is_up_to_date(self):
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7))
+
+    @property
+    def contributers(self):
+        return tweet_models.TwitterUser.objects.filter(
+            id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
+        )
 
 
 class Stock(models.Model):

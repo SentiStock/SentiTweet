@@ -1,6 +1,7 @@
 from django.urls import path
-from tweet.views import hashtag
+from tweet.views import hashtag, set_view
 
 urlpatterns = [
-	path('hashtag/<str:hashtag_value>/', hashtag, name='hashtag'),
+	path('hashtags/<str:hashtag_value>/', hashtag, name='hashtag'),
+	path('sets/<str:id>/', set_view, name='set'),
 ]
