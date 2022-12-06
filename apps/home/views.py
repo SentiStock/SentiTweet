@@ -5,14 +5,19 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django import template
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from stock.models import Company
+from tweet.models import HashTag
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
+    companies = Company.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
+    hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
+    context = {'segment': 'index', 'companies': companies, 'hashtags': hashtags}
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
@@ -20,11 +25,14 @@ def index(request):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
-    try:
+    companies = Company.objects.all()
+    hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
 
+    context = {'companies': companies, 'hashtags': hashtags}
+
+    try:
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
@@ -35,7 +43,6 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
     except template.TemplateDoesNotExist:
-
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
 

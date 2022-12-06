@@ -55,6 +55,10 @@ class HashTag(models.Model):
     companies = models.ManyToManyField(Company, related_name='hashtags')
     value = models.CharField(max_length=255)
 
+    @property
+    def clean_value(self):
+        return self.value[1:]
+
     def __str__(self):
         return self.value
 

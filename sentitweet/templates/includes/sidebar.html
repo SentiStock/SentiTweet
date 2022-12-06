@@ -6,47 +6,76 @@
                 <div class="b-bg">
                     <i class="feather icon-trending-up"></i>
                 </div>
-                <span class="b-title">Datta Able</span>
+                <span class="b-title">Senti Tweet</span>
             </a>
             <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
+
+                {% comment %} <li class="nav-item">
+                    <div class="main-search">
+                        <div class="input-group">
+                            <input type="text" id="m-search" class="form-control" placeholder="Search . . .">
+                            <a href="javascript:" class="input-group-append search-close">
+                                <i class="feather icon-x input-group-text"></i>
+                            </a>
+                            <span class="input-group-append search-btn btn btn-primary">
+                                <i class="feather icon-search input-group-text"></i>
+                            </span>
+                        </div>
+                    </div>
+                </li> {% endcomment %}
+
+                <li class="nav-item">
+                    <a href="javascript:" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-search"></i></span>
+                        <input type="text" id="m-search" class="pcoded-mtext" placeholder="Search...">
+                    </a>
+                </li>
+
                 <li class="nav-item pcoded-menu-caption">
                     <label>Navigation</label>
                 </li>
-                <li data-username="dashboard Default Ecommerce CRM Analytics Crypto Project" 
+                <li data-username="dashboard home" 
                     class="nav-item {% if 'index' in segment %} active {% endif %}">
                     <a href="/" class="nav-link "><span class="pcoded-micon"><i class="feather icon-home"></i></span><span
-                            class="pcoded-mtext">Dashboard</span></a>
-                </li>
-                <li data-username="Profile Page" 
-                    class="nav-item {% if 'profile' in segment %} active {% endif %}">
-                    <a href="/profile.html" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-user"></i></span>
-                            <span class="pcoded-mtext">Profile Page</span></a>
-                </li>                
-                <li class="nav-item pcoded-menu-caption">
-                    <label>UI Element</label>
-                </li>
-                <li data-username="basic components Button Alert Badges breadcrumb Paggination progress Tooltip popovers Carousel Cards Collapse Tabs pills Modal Grid System Typography Extra Shadows Embeds"
+                            class="pcoded-mtext">Home</span></a>
+                </li>              
+                <li data-username="companies company"
                     class="nav-item pcoded-hasmenu ">
-                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span
-                            class="pcoded-mtext">Components</span></a>
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span><span
+                            class="pcoded-mtext">Companies</span></a>
                     <ul class="pcoded-submenu">
-                        <li class=""><a href="/bc_button.html" class="">Button</a></li>
-                        <li class=""><a href="/bc_badges.html" class="">Badges</a></li>
-                        <li class=""><a href="/bc_breadcrumb-pagination.html" class="">Breadcrumb & paggination</a></li>
-                        <li class=""><a href="/bc_collapse.html" class="">Collapse</a></li>
-                        <li class=""><a href="/bc_tabs.html" class="">Tabs & pills</a></li>
-                        <li class=""><a href="/bc_typography.html" class="">Typography</a></li>
-
-
-                        <li class=""><a href="/icon-feather.html" class="">Feather<span
-                                class="pcoded-badge label label-danger">NEW</span></a></li>
+                        {% for company in companies|slice:':10' %}
+                            <li class=""><a href="/company/{{company.symbol}}/" class="">{{company.name}}</a></li>
+                        {% endfor %}
                     </ul>
                 </li>
-                <li class="nav-item pcoded-menu-caption">
+                <li data-username="hashtags"
+                    class="nav-item pcoded-hasmenu ">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-hash"></i></span><span
+                            class="pcoded-mtext">Hashtags</span></a>
+                    <ul class="pcoded-submenu">
+                        {% for hashtag in hashtags|slice:':10' %}
+                            <li class=""><a href="/tweet/hashtag/{{hashtag.clean_value}}/" class="">{{hashtag.value}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li data-username="favorite mine"
+                    class="nav-item pcoded-hasmenu ">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-star"></i></span><span
+                            class="pcoded-mtext">Favorite</span></a>
+                    <ul class="pcoded-submenu">
+                    </ul>
+                </li>
+                <li data-username="dashboard custom" 
+                    class="nav-item {% if 'custom' in segment %} active {% endif %}">
+                    <a href="/" class="nav-link "><span class="pcoded-micon"><i class="feather icon-twitter"></i></span><span
+                            class="pcoded-mtext">Custom</span></a>
+                </li>    
+
+                {% comment %} <li class="nav-item pcoded-menu-caption">
                     <label>Forms & table</label>
                 </li>
                 <li data-username="form elements advance componant validation masking wizard picker select"
@@ -72,10 +101,22 @@
                     class="nav-item {% if 'map-google' in segment %} active {% endif %}">
                     <a href="/map-google.html" class="nav-link "><span
                         class="pcoded-micon"><i class="feather icon-map"></i></span><span
-                        class="pcoded-mtext">Maps</span></a></li>
+                        class="pcoded-mtext">Maps</span></a></li> {% endcomment %}
                 <li class="nav-item pcoded-menu-caption">
-                    <label>Pages</label>
+                    <label>Network</label>
                 </li>
+                <li data-username="Profile Page" 
+                    class="nav-item {% if 'profile' in segment %} active {% endif %}">
+                    <a href="/profile.html" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-user"></i></span>
+                            <span class="pcoded-mtext">Profile Page</span></a>
+                </li>
+                <li data-username="Users" 
+                    class="nav-item {% if 'user' in segment %} active {% endif %}">
+                    <a href="/profile.html" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-users"></i></span>
+                            <span class="pcoded-mtext">Users</span></a>
+                </li>  
                 <li data-username="Authentication Sign up Sign in reset password Change password Personal information profile settings map form subscribe"
                     class="nav-item pcoded-hasmenu">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span
@@ -86,17 +127,13 @@
                     </ul>
                 </li>
 
-                <li data-username="Sample Page" class="nav-item"><a href="/page-blank.html" class="nav-link"><span
-                        class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Sample page</span></a>
-                </li>
-
                 <li data-username="Disabled Menu" class="nav-item">
                     <a href="{% url 'logout' %}" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-power"></i></span><span class="pcoded-mtext">Logout</span>
                     </a>
                 </li>
                 <li class="nav-item pcoded-menu-caption">
-                    <label>More Resources</label>
+                    <label>Help</label>
                 </li>                    
                 <li data-username="Support Page" class="nav-item ">
                     <a target="_blank" href="https://appseed.us/support" class="nav-link">

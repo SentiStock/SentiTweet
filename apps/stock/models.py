@@ -15,11 +15,7 @@ class Company(models.Model):
         # TODO check if this is the right approach
         # TODO we could check if the word stock is in the hashtag + other keywords
 
-        name = self.name
-        if len(name.split(' ')) > 1:
-            name = name.split(' ')[0]
-        if len(name.split('.')) > 1:
-            name = name.split('.')[0]
+        name = self.search_name
 
         filtered_hashtags = self.hashtags.filter(
             value__icontains=name
@@ -33,6 +29,10 @@ class Company(models.Model):
 
     def get_top_hashtags(self, top=10):
         return self.hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def search_name(self):
+        return self.name.split(' ')[0].split('.')[0]
 
 
 class Stock(models.Model):
