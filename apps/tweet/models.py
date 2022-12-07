@@ -1,6 +1,7 @@
 import pandas as pd
-from authentication.models import CustomUser, FavoritesModelMixin
+from authentication.models import Contributor, FavoritesModelMixin
 from django.core import serializers
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -25,9 +26,19 @@ class PandasModelMixin(models.Model):
 
 
 class TwitterUser(PandasModelMixin):
+    id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     username = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(null=True, blank=True)
+    joined_date = models.DateTimeField(null=True, blank=True)
+    url = models.URLField(max_length=511, null=True, blank=True)
+    verified = models.BooleanField(null=True, blank=True)
+
+    followers_count = models.PositiveIntegerField(null=True, blank=True)
+    following_count = models.PositiveIntegerField(null=True, blank=True)
+    tweet_count = models.PositiveIntegerField(null=True, blank=True)
+    listed_count = models.PositiveIntegerField(null=True, blank=True)
+    # Entities TODO
+    # Withheld TODO
 
     @property
     def newest_tweet(self):
@@ -42,17 +53,29 @@ class TwitterUser(PandasModelMixin):
 
 
 class Tweet(PandasModelMixin):
+    id = models.BigIntegerField(primary_key=True)
     companies = models.ManyToManyField('stock.Company', related_name='tweets')
     user = models.ForeignKey(TwitterUser, on_delete=models.PROTECT, related_name='tweets')
     post_date = models.DateTimeField()
-    text = models.TextField()
-    cleaned_text = models.TextField(null=True, blank=True)
-    comment_number = models.PositiveIntegerField(default=0)
-    retweet_number = models.PositiveIntegerField(default=0)
-    like_number = models.PositiveIntegerField(default=0)
     source = models.CharField(max_length=255, null=True, blank=True)
 
-    # sentiment = models.IntegerField()
+    text = models.TextField()
+    cleaned_text = models.TextField(null=True, blank=True)
+
+    comment_number = models.PositiveIntegerField(null=True, blank=True)
+    retweet_number = models.PositiveIntegerField(null=True, blank=True)
+    like_number = models.PositiveIntegerField(null=True, blank=True)
+
+    sentiment_positive = models.DecimalField(null=True, blank=True, 
+        validators=[MinValueValidator(0), MaxValueValidator(1)], decimal_places=4, max_digits=5)
+    sentiment_neutral = models.DecimalField(null=True, blank=True, 
+        validators=[MinValueValidator(0), MaxValueValidator(1)], decimal_places=4, max_digits=5)
+    sentiment_negative = models.DecimalField(null=True, blank=True, 
+        validators=[MinValueValidator(0), MaxValueValidator(1)], decimal_places=4, max_digits=5)
+    sentiment_uncertain = models.DecimalField(null=True, blank=True, 
+        validators=[MinValueValidator(0), MaxValueValidator(1)], decimal_places=4, max_digits=5)
+    sentiment_compound = models.DecimalField(null=True, blank=True, 
+        validators=[MinValueValidator(-1), MaxValueValidator(1)], decimal_places=4, max_digits=5)
 
     def __str__(self):
         return str(self.id)
@@ -91,7 +114,8 @@ class HashTag(FavoritesModelMixin):
 
 class Set(FavoritesModelMixin):
     name = models.CharField(max_length=255)
-    creator = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='sets')
+    description = models.TextField(null=True, blank=True)
+    creator = models.ForeignKey(Contributor, on_delete=models.PROTECT, related_name='sets')
     hashtags = models.ManyToManyField(HashTag, related_name='sets')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 

@@ -12,6 +12,7 @@ from sentitweet.utils import get_sql_engine
 class Company(FavoritesModelMixin):
     name = models.CharField(max_length=255)
     symbol = models.CharField(max_length=31)
+    twitter_query_set = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import nltk
 import numpy as np
 import pandas as pd
+import requests
+from django.conf import settings
 from nltk.corpus import stopwords
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.decomposition import PCA
@@ -16,7 +18,15 @@ from tweet.models import HashTag, Tweet
 
 def get_sentiment(tweets):
     # TODO get tweet sentiment
-    pass
+    url = "https://sentitweetsentimentapi.azurewebsites.net/api/sentitweetsentiment"
+ 
+    headers = {"Content-Type": "application/json; charset=utf-8", "x-functions-key": settings.X_FUNCTION_KEY}
+    
+    data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
+    
+    response = requests.post(url, headers=headers, json=data)
+    print(response)
+    print(vars(response))
 
 def get_and_create_hashtags(tweets):
     for tweet in tweets:

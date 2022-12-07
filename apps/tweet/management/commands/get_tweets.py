@@ -24,10 +24,10 @@ class Command(BaseCommand):
             print(f'gathering {company}')
             print([(i.value, i.tweets.count()) for i in company.get_search_hashtags(number_of_search_hashtags)])
 
-            try:
-                get_or_update_tweets_for_company(company, number_of_search_hashtags)
-            except Exception as e:
-                self.stdout.write(f'Something went wrong: {e}')
+            # try:
+            get_or_update_tweets_for_company(company, number_of_search_hashtags)
+            # except Exception as e:
+            #     self.stdout.write(f'Something went wrong: {e}')
 
         self.stdout.write(self.style.SUCCESS(
             'Successfully gathered tweets from twitter'))

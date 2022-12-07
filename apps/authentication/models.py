@@ -5,39 +5,8 @@ from django.db import models
 from django.db.models import Q
 
 
-class CustomUser(AbstractUser):
-    MODE_CHOICES = (
-        ('private', 'PRIVATE'),
-        ('public', 'PUBLIC'),
-    )
-    mode = models.CharField(
-        max_length = 20,
-        choices = MODE_CHOICES,
-        default = 'private'
-    )
-
-
-class UserFollowing(models.Model):
-    user = models.ForeignKey(
-        CustomUser, related_name="following", on_delete=models.CASCADE)
-    following_user = models.ForeignKey(
-        CustomUser, related_name="followers", on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'following_user'],  name="unique_followers")
-        ]
-
-        ordering = ["-created"]
-
-    def __str__(self):
-        f"{self.user} follows {self.following_user}"
-
-
 class Favorite(models.Model):
-    user = models.ForeignKey(CustomUser, related_name='favorites', on_delete=models.CASCADE)
+    user = models.ForeignKey('authentication.Contributor', related_name='favorites', on_delete=models.CASCADE)
     favorite_ct = models.ForeignKey(
         ContentType, 
         related_name='favorite_obj', 
@@ -49,7 +18,7 @@ class Favorite(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def __str__(self):
-        return f'{self.user} likes {self.favorite}'
+        return f'{self.user} follows {self.favorite}'
 
     class Meta:
         ordering = ['favorite_ct']
@@ -64,3 +33,16 @@ class FavoritesModelMixin(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Contributor(AbstractUser, FavoritesModelMixin):
+    MODE_CHOICES = (
+        ('private', 'PRIVATE'),
+        ('public', 'PUBLIC'),
+    )
+    mode = models.CharField(
+        max_length = 20,
+        choices = MODE_CHOICES,
+        default = 'private'
+    )
+

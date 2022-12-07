@@ -118,7 +118,7 @@ SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{databa
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-AUTH_USER_MODEL = "authentication.CustomUser" 
+AUTH_USER_MODEL = "authentication.Contributor" 
     
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -160,5 +160,7 @@ STATICFILES_DIRS = (
 # CRONJOBS
 CRONJOBS = [
     # Everyday at 02:00 we fetch new tweets from twitter for every company
-    ('0 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
+
+X_FUNCTION_KEY=os.environ['X_FUNCTION_KEY']

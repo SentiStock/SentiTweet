@@ -72,11 +72,11 @@
                                                                 <h5 class="mb-1">Event {{forloop.counter}}</h5>
                                                             </td>
                                                             <td>
-                                                                <p class="mb-1">{% for word in top_word|slice:':5' %}{{word}} - {% endfor %}</p>
-                                                                <p class="mb-1">{% for word in top_word|slice:'5:' %}{{word}} - {% endfor %}</p>
+                                                                <p class="mb-1" style="white-space: initial;">{% for word in top_word %} {% if not forloop.counter0 == 0 %} - {% endif %}{{word}} {% endfor %}</p>
+                                                                {% comment %} <p class="mb-1">{% for word in top_word|slice:'5:' %}{{word}} - {% endfor %}</p> {% endcomment %}
                                                             </td>
                                                             <td>
-                                                                <p class="mb-1" style="white-space: initial;">>{{best_tweet.text}}</p>
+                                                                <p class="mb-1" style="white-space: initial;">{{best_tweet.text}}</p>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}
