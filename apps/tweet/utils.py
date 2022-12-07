@@ -156,12 +156,13 @@ def get_top_keywords(data, clusters, labels, n_terms):
     return key_words
 
 
-def cluster_tweets(tweets, max_k=10):
+def cluster_tweets(tweets, max_k=10, number_of_best_tweets=3):
     if not isinstance(tweets, pd.DataFrame):
         tweets = Tweet.as_dataframe(queryset=tweets)
 
     if len(tweets) == 0:
-        raise Exception(f'There are no tweets in this queryset...')
+        return None, {}
+        # raise Exception(f'There are no tweets in this queryset...')
         
     tweets.drop_duplicates(subset=["cleaned_text"], inplace=True)
     tweets.reset_index(inplace=True, drop=True)
@@ -176,7 +177,7 @@ def cluster_tweets(tweets, max_k=10):
     clusters = model_predict(model, text)
     tweets['cluster'] = clusters
 
-    best_tweets = get_most_repr_tweets(model, tweets, text)
+    best_tweets = get_most_repr_tweets(model, tweets, text, number_of_best_tweets)
     top_words = get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
 
     return best_tweets, top_words

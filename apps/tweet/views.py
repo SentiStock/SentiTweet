@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
 from stock.models import Company
-from stock.utils import (get_company_by_symbol_or_name,
+from stock.utils import (get_cluster_context, get_company_by_symbol_or_name,
                          get_relevent_model_context)
 from tweet.models import HashTag, Set
 
@@ -23,8 +23,11 @@ def hashtag(request, hashtag_value):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render({}, request))
 
+    tweets = hashtag.tweets.all()
+
     context = get_relevent_model_context()
     context['hashtag'] = hashtag
+    context['clusters'] = get_cluster_context(tweets)
 
     return render(request, 'tweet/hashtag_detail.html', context)
 
@@ -43,7 +46,10 @@ def set_view(request, id):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render({}, request))
 
+    tweets = set_object.tweets.all()
+
     context = get_relevent_model_context()
     context['set'] = set_object
+    context['clusters'] = get_cluster_context(tweets)
 
     return render(request, 'tweet/set_detail.html', context)

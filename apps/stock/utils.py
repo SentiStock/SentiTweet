@@ -1,6 +1,7 @@
 from django.db.models import Count, Q
 from stock.models import Company
 from tweet.models import HashTag, Set
+from tweet.utils import cluster_tweets
 
 
 def get_company_by_symbol_or_name(symbol_or_name):
@@ -24,7 +25,14 @@ def get_company_by_symbol_or_name(symbol_or_name):
 def get_relevent_model_context():
     companies = Company.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
     hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
-    sets = Set.objects.all()#.order_by('followers')
+    sets = Set.objects.filter(mode='public')#.order_by('followers')
 
     return {'sets': sets, 'companies': companies, 'hashtags': hashtags}
+
+
+def get_cluster_context(tweets):
+    if len(tweets) > 50:
+        best_tweets, top_words = cluster_tweets(tweets, number_of_best_tweets=1)
+        return zip(top_words.values(), best_tweets.itertuples())
+    return None
 

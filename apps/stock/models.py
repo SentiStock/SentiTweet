@@ -41,6 +41,10 @@ class Company(FavoritesModelMixin):
         return self.tweets.order_by('-post_date').first()
 
     @property
+    def oldest_tweet(self):
+        return self.tweets.order_by('-post_date').last()
+
+    @property
     def is_up_to_date(self):
         return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7))
 
@@ -49,6 +53,10 @@ class Company(FavoritesModelMixin):
         return tweet_models.TwitterUser.objects.filter(
             id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
         )
+
+    @property
+    def best_contributers(self, top=10):
+        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
 
 class Stock(models.Model):

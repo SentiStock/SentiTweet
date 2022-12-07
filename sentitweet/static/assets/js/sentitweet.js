@@ -13,3 +13,20 @@ function filterSearchAll() {
       }
     }
   }
+
+// function filterTable() {
+//   var input, filter, i;
+//   input = document.getElementById("searchTable");
+//   filter = input.value.toUpperCase();
+//   table = document.getElementById("listAllTable");
+//   options = table.getElementsByTagName("tr");
+// }
+
+
+$("#searchTable").on("keyup", function() {
+  var value = $(this).val().toLowerCase();
+  $("#listAllTable tr").filter(function() {
+      $(this).toggle($(this).text()
+      .toLowerCase().indexOf(value) > -1)
+  });
+});

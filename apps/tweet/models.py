@@ -29,6 +29,14 @@ class TwitterUser(PandasModelMixin):
     username = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def newest_tweet(self):
+        return self.tweets.order_by('-post_date').first()
+
+    @property
+    def oldest_tweet(self):
+        return self.tweets.order_by('-post_date').last()
+
     def __str__(self):
         return self.name
 
@@ -60,10 +68,22 @@ class HashTag(FavoritesModelMixin):
         return self.value[1:]
 
     @property
+    def newest_tweet(self):
+        return self.tweets.order_by('-post_date').first()
+
+    @property
+    def oldest_tweet(self):
+        return self.tweets.order_by('-post_date').last()
+        
+    @property
     def contributers(self):
         return TwitterUser.objects.filter(
             id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
         )
+
+    @property
+    def best_contributers(self, top=10):
+        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
     def __str__(self):
         return self.value
@@ -86,10 +106,26 @@ class Set(FavoritesModelMixin):
     )
 
     @property
+    def tweets(self):
+        tweet_ids = set(self.hashtags.values_list('tweets', flat=True).distinct())
+        return Tweet.objects.filter(id__in=tweet_ids)
+
+    @property
+    def newest_tweet(self):
+        return self.tweets.order_by('-post_date').first()
+
+    @property
+    def oldest_tweet(self):
+        return self.tweets.order_by('-post_date').last()
+
+    @property
     def contributers(self):
-        tweets = set(self.hashtags.values_list('tweets', flat=True).distinct())
-        twitter_user_ids = set(Tweet.objects.filter(id__in=tweets).values_list('user_id', flat=True).distinct())
+        twitter_user_ids = set(self.tweets.values_list('user_id', flat=True).distinct())
         return TwitterUser.objects.filter(id__in=twitter_user_ids)
+    
+    @property
+    def best_contributers(self, top=10):
+        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
     def __str__(self):
         return self.name
