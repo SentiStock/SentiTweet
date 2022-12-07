@@ -44,8 +44,6 @@ def process_api_tweets(response):
 
 
 def process_api_users(response):
-
-    [print(i) for i in response.data]
     users_data = [[
         user.id,
         user.name,
@@ -156,6 +154,12 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
 def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
     hashtags = company.get_search_hashtags(number_of_search_hashtags)
 
+    tweets_df = get_tweets_by_hashtag(company.search_name)
+
+    if not tweets_df.empty:
+        users_df = get_users_by_ids(list(tweets_df.user))
+        update_or_create_tweets_and_users_from_df(tweets_df, users_df, company)
+
     for hashtag in hashtags:
         tweets_df = get_tweets_by_hashtag(hashtag)
 
@@ -163,7 +167,6 @@ def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
             continue
 
         users_df = get_users_by_ids(list(tweets_df.user))
-
         update_or_create_tweets_and_users_from_df(tweets_df, users_df, company)
 
 

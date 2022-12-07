@@ -4,6 +4,7 @@ include .env
 docker_compose = docker-compose -f devops/deployment-from-${IMAGE_SOURCE}.yml
 docker_web = docker exec -it sentitweet
 docker_db_exec = docker exec -i postgres-db-sentitweet
+docker_db = docker exec -it postgres-db-sentitweet
 
 .PHONY: up
 up: # Builds, (re)creates, starts, and attaches to containers for a service. Deletes all previously created contianer images
@@ -25,6 +26,10 @@ down: # Stops containers and removes containers, networks, volumes, and images c
 shell: # Enter the shell of the docker contianer where sentitweet is running
 	@$(docker_web) sh -c "export COLUMNS=`tput cols`; export LINES=`tput lines`; exec bash";
 
+.PHONY: shell-db
+shell-db: # Enter the shell of the docker where sentitweet is running
+	@$(docker_db) sh -c "export COLUMNS=`tput cols`; export LINES=`tput lines`; exec bash";
+
 .PHONY: migrate
 migrate: # Execute migrate command in sentitweet container
 	@$(docker_web) python manage.py migrate
@@ -40,6 +45,10 @@ db-rebuild-migrations:
 
 .PHONY: db-redeploy
 db-redeploy: db-rebuild-migrations migrate
+
+.PHONY: db-backup
+db-backup: 
+	@$(docker_db) pg_dump -U postgres dbsentitweet > db_backup.sql
 
 .PHONY: install-requirements
 install: # Execute migrate command in sentitweet container

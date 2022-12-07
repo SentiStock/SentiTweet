@@ -63,7 +63,7 @@
                     <ul class="pcoded-submenu">
                         <li class=""><a href="/companies/" class="">All Companies</a></li>
                         <hr/>
-                        {% for company in companies|slice:':10' %}
+                        {% for company in companies|dictsortreversed:'market_cap'|slice:':10' %}
                             <li class=""><a href="/companies/{{company.symbol}}/" class="">{{company.name}}</a></li>
                         {% endfor %}
                     </ul>

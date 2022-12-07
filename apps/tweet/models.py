@@ -99,14 +99,14 @@ class HashTag(FavoritesModelMixin):
         return self.tweets.order_by('-post_date').last()
         
     @property
-    def contributers(self):
+    def twitter_users(self):
         return TwitterUser.objects.filter(
             id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
         )
 
     @property
-    def best_contributers(self, top=10):
-        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+    def top_twitter_users(self, top=10):
+        return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
     def __str__(self):
         return self.value
@@ -143,13 +143,13 @@ class Set(FavoritesModelMixin):
         return self.tweets.order_by('-post_date').last()
 
     @property
-    def contributers(self):
+    def twitter_users(self):
         twitter_user_ids = set(self.tweets.values_list('user_id', flat=True).distinct())
         return TwitterUser.objects.filter(id__in=twitter_user_ids)
     
     @property
-    def best_contributers(self, top=10):
-        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+    def top_twitter_users(self, top=10):
+        return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
     def __str__(self):
         return self.name

@@ -12,7 +12,10 @@ from sentitweet.utils import get_sql_engine
 class Company(FavoritesModelMixin):
     name = models.CharField(max_length=255)
     symbol = models.CharField(max_length=31)
-    twitter_query_set = models.CharField(max_length=255)
+    market_cap = models.BigIntegerField(null=True, blank=True)
+    stock_price = models.IntegerField(null=True, blank=True)
+    country = models.CharField(max_length=63, null=True, blank=True)
+    twitter_query_set = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -47,24 +50,14 @@ class Company(FavoritesModelMixin):
 
     @property
     def is_up_to_date(self):
-        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7))
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
 
     @property
-    def contributers(self):
+    def twitter_users(self):
         return tweet_models.TwitterUser.objects.filter(
             id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
         )
 
     @property
-    def best_contributers(self, top=10):
-        return self.contributers.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
-
-
-class Stock(models.Model):
-    comapany = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='stocks')
-    date = models.DateField()
-    volume = models.PositiveIntegerField()
-    open = models.PositiveIntegerField()
-    close = models.PositiveIntegerField()
-    high = models.PositiveIntegerField()
-    low = models.PositiveIntegerField()
+    def top_twitter_users(self, top=10):
+        return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
