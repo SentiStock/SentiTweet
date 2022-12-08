@@ -163,4 +163,4 @@ CRONJOBS = [
     ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
 
-X_FUNCTION_KEY=os.environ['X_FUNCTION_KEY']
+SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY=os.environ['SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY']
