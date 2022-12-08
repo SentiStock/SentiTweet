@@ -23,40 +23,27 @@
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h2>{{hashtag.value}}</h2>
+                                            <h2>{{user.username}}</h2>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h4>Tweet#: {{hashtag.tweets.all|length}}</h4>
-                                            <h4>Twitter users#: {{hashtag.twitter_users.all|length}}</h4>
-                                            <h4>Sets#: {{hashtag.sets.all|length}}</h4>
-                                            <h4>Followers#: {{hashtag.favorites.all|length}}</h4>
+                                            <h3>Tweet#: {{user.tweets.all|length}}</h3>
+                                            <h3>Followers#: {{user.favorites.all|length}}</h3>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h4>Connected companies</h4>
-                                            {% for company in hashtag.companies.all %}
-                                                {{company}}
-                                            {% endfor %}
+                                            <h4>Total Likes#: {{user.total_likes}}</h4>
+                                            <h4>Total Retweets#: {{user.total_retweets}}</h4>
+                                            <h4>Total Comments#: {{user.total_comments}}</h4>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h4>Total Likes#: {{hashtag.total_likes}}</h4>
-                                            <h4>Total Retweets#: {{hashtag.total_retweets}}</h4>
-                                            <h4>Total Comments#: {{hashtag.total_comments}}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!--[ Clusters ] start-->
                                 {% if clusters %}
                                     <div class="col-xl-12 col-md-12 m-b-30">
@@ -189,9 +176,7 @@
                                                 {% for tweet in tweets|dictsortreversed:'like_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <a href="/users/{{tweet.user.id}}/">
-                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
-                                                            </a>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>
@@ -224,9 +209,7 @@
                                                 {% for tweet in tweets|dictsortreversed:'retweet_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <a href="/users/{{tweet.user.id}}/">
-                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
-                                                            </a>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>
@@ -259,9 +242,7 @@
                                                 {% for tweet in tweets|dictsortreversed:'comment_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <a href="/users/{{tweet.user.id}}/">
-                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
-                                                            </a>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>

@@ -24,16 +24,18 @@
                                     <div class="card">
                                         <div class="card-block">
                                             <h2>{{set.name}}</h2>
-                                            <h2>by: {{set.creator}}</h2>
+                                            <h6>by: {{set.creator}}</h6>
+                                            <p>{{set.description}}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h3>Hashtag#: {{set.hashtags.all|length}}</h3>
-                                            <h3>Contributers#: {{set.contributers.all|length}}</h3>
-                                            <h3>Followers#: {{set.favorites.all|length}}</h3>
+                                            <h4>Tweets#: {{set.tweets.all|length}}</h4>
+                                            <h4>Hashtag#: {{set.hashtags.all|length}}</h4>
+                                            <h4>Twitter Users#: {{set.twitter_users.all|length}}</h4>
+                                            <h4>Followers#: {{set.favorites.all|length}}</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -47,161 +49,36 @@
                                         </div>
                                     </div>
                                 </div>
-                                                            <!--[ Recent Users ] start-->
+                                <!--[ Clusters ] start-->
                                 {% if clusters %}
-                                <div class="col-xl-12 col-md-6">
-                                    <div class="card Recent-Users">
-                                        <div class="card-header">
-                                            <h5>Potential Events</h5>
-                                        </div>
-                                        <div class="card-block px-0 py-3">
-                                            <div class="table-responsive">
-                                                <table class="table table-hover">
-                                                    <tbody>
-                                                    <tr>
-                                                        <th>Event#</th>
-                                                        <th>Top Used Words</th>
-                                                        <th>Most Representative Tweet</th>
-                                                    </tr>
-                                                    {% for top_word, best_tweet in clusters %}
-                                                        <tr class="unread">
-                                                            <td>
-                                                                <h5 class="mb-1">Event {{forloop.counter}}</h5>
-                                                            </td>
-                                                            <td>
-                                                                <p class="mb-1">{% for word in top_word|slice:':5' %}{{word}} - {% endfor %}</p>
-                                                                <p class="mb-1">{% for word in top_word|slice:'5:' %}{{word}} - {% endfor %}</p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="mb-1">{{best_tweet.text}}</p>
-                                                            </td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                    </tbody>
-                                                </table>
+                                    <div class="col-xl-12 col-md-12 m-b-30">
+                                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                            {% for i in clusters %}
+                                                <li class="nav-item {% if forloop.counter == 1 %} active show {% endif %}">
+                                                    <a class="nav-link" id="event-{{forloop.counter}}-tab" data-toggle="tab" href="#event-{{forloop.counter}}" role="tab"
+                                                        aria-controls="event-{{forloop.counter}}" aria-selected="{% if forloop.counter == 1 %} true {% else %} false {% endif %}">Event {{forloop.counter}}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <div class="tab-content" id="myTabContent">
+                                        {% for top_word, best_tweets in clusters %}
+                                            <div class="tab-pane fade {% if forloop.counter == 1 %} active show {% endif %}" id="event-{{forloop.counter}}" role="tabpanel" aria-labelledby="event-{{forloop.counter}}-tab">
+                                                {% comment %} <hr/> {% endcomment %}
+                                                <h4>Top used words in this potential event</h4> 
+                                                <hr/>
+                                                <p>{% for word in top_word %} {% if not forloop.counter == 1 %} - {% endif %}{{word}} {% endfor %}</p>
+                                                <h4>Most representative tweets for this potential event</h4> 
+                                                {% for best_tweet in best_tweets %}
+                                                    <hr/>
+                                                    <p class="m-0 text-c-green" style="white-space: initial;">{{best_tweet}}</p>
+                                                {% endfor %}
                                             </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
-                                </div>
                                 {% endif %}
-                                <!--[ Recent Users ] end-->
-
-                                <!--[social-media section] start-->
-                                <div class="col-md-12 col-xl-4">
-                                    <div class="card card-social">
-                                        <div class="card-block border-bottom">
-                                            <div class="row align-items-center justify-content-center">
-                                                <div class="col-auto">
-                                                    <i class="fab fa-facebook-f text-primary f-36"></i>
-                                                </div>
-                                                <div class="col text-right">
-                                                    <h3>12,281</h3>
-                                                    <h5 class="text-c-green mb-0">+7.2% <span
-                                                            class="text-muted">Total Likes</span></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-block">
-                                            <div class="row align-items-center justify-content-center card-active">
-                                                <div class="col-6">
-                                                    <h6 class="text-center m-b-10"><span
-                                                            class="text-muted m-r-5">Target:</span>35,098</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width:60%;height:6px;" aria-valuenow="60"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <h6 class="text-center  m-b-10"><span
-                                                            class="text-muted m-r-5">Duration:</span>3,539</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-theme2" role="progressbar"
-                                                                style="width:45%;height:6px;" aria-valuenow="45"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card card-social">
-                                        <div class="card-block border-bottom">
-                                            <div class="row align-items-center justify-content-center">
-                                                <div class="col-auto">
-                                                    <i class="fab fa-twitter text-c-blue f-36"></i>
-                                                </div>
-                                                <div class="col text-right">
-                                                    <h3>11,200</h3>
-                                                    <h5 class="text-c-purple mb-0">+6.2% <span class="text-muted">Total Likes</span>
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-block">
-                                            <div class="row align-items-center justify-content-center card-active">
-                                                <div class="col-6">
-                                                    <h6 class="text-center m-b-10"><span
-                                                            class="text-muted m-r-5">Target:</span>34,185</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-green" role="progressbar"
-                                                                style="width:40%;height:6px;" aria-valuenow="40"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <h6 class="text-center  m-b-10"><span
-                                                            class="text-muted m-r-5">Duration:</span>4,567</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-blue" role="progressbar"
-                                                                style="width:70%;height:6px;" aria-valuenow="70"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card card-social">
-                                        <div class="card-block border-bottom">
-                                            <div class="row align-items-center justify-content-center">
-                                                <div class="col-auto">
-                                                    <i class="fab fa-google-plus-g text-c-red f-36"></i>
-                                                </div>
-                                                <div class="col text-right">
-                                                    <h3>10,500</h3>
-                                                    <h5 class="text-c-blue mb-0">+5.9% <span
-                                                            class="text-muted">Total Likes</span></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-block">
-                                            <div class="row align-items-center justify-content-center card-active">
-                                                <div class="col-6">
-                                                    <h6 class="text-center m-b-10"><span
-                                                            class="text-muted m-r-5">Target:</span>25,998</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width:80%;height:6px;" aria-valuenow="80"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-6">
-                                                    <h6 class="text-center  m-b-10"><span
-                                                            class="text-muted m-r-5">Duration:</span>7,753</h6>
-                                                    <div class="progress">
-                                                        <div class="progress-bar progress-c-theme2" role="progressbar"
-                                                                style="width:50%;height:6px;" aria-valuenow="50"
-                                                                aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--[social-media section] end-->
+                                <!--[ Clusters ] end-->
+                                
                                 <!-- [ rating list ] starts-->
                                 <div class="col-xl-4 col-md-6">
                                     <div class="card user-list">
@@ -273,300 +150,117 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- [ rating list ] end-->
+                                <!-- [ Best Tweets ] end-->
                                 <div class="col-xl-8 col-md-12 m-b-30">
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link" id="home-tab" data-toggle="tab" href="#home" role="tab"
-                                                aria-controls="home" aria-selected="false">Today</a>
+                                            <a class="nav-link active show" id="like-tab" data-toggle="tab" href="#like" role="tab"
+                                                aria-controls="like" aria-selected="true">Most Liked Tweets</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active show" id="profile-tab" data-toggle="tab"
-                                                href="#profile" role="tab" aria-controls="profile" aria-selected="true">This
-                                                Week</a>
+                                            <a class="nav-link" id="retweet-tab" data-toggle="tab"
+                                                href="#retweet" role="tab" aria-controls="retweet" aria-selected="false">Most Retweeted Tweets</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact"
-                                                role="tab" aria-controls="contact" aria-selected="false">All</a>
+                                            <a class="nav-link" id="comment-tab" data-toggle="tab" href="#comment"
+                                                role="tab" aria-controls="comment" aria-selected="false">Most Commented Tweets</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content" id="myTabContent">
-                                        <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                        <div class="tab-pane fade active show" id="like" role="tabpanel" aria-labelledby="like-tab">
                                             <table class="table table-hover">
                                                 <thead>
                                                 <tr>
-                                                    <th>User</th>
-                                                    <th>Activity</th>
-                                                    <th>Time</th>
-                                                    <th>Status</th>
-                                                    <th class="text-right"></th>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">3:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-2.jpg"
-                                                                                alt="activity-user">Albert Andersen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Jumps over the lazy</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">2:37 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-red">Missed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-red f-10"></i>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-3.jpg"
-                                                                                alt="activity-user">Silje Larsen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Dog the quick brown</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">10:23 AM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-purple">Delayed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-purple f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">4:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
+                                                {% for tweet in tweets|dictsortreversed:'like_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
 
                                         </div>
-                                        <div class="tab-pane fade active show" id="profile" role="tabpanel"
-                                                aria-labelledby="profile-tab">
+                                        <div class="tab-pane fade" id="retweet" role="tabpanel"
+                                                aria-labelledby="retweet-tab">
                                             <table class="table table-hover">
                                                 <thead>
                                                 <tr>
-                                                    <th>User</th>
-                                                    <th>Activity</th>
-                                                    <th>Time</th>
-                                                    <th>Status</th>
-                                                    <th class="text-right"></th>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-2.jpg"
-                                                                                alt="activity-user">Albert Andersen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Jumps over the lazy</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">2:37 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-red">Missed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-red f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">3:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">4:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-3.jpg"
-                                                                                alt="activity-user">Silje Larsen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Dog the quick brown</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">10:23 AM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-purple">Delayed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-purple f-10"></i>
-                                                    </td>
-                                                </tr>
+                                                {% for tweet in tweets|dictsortreversed:'retweet_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
 
                                         </div>
-                                        <div class="tab-pane fade" id="contact" role="tabpanel"
-                                                aria-labelledby="contact-tab">
+                                        <div class="tab-pane fade" id="comment" role="tabpanel"
+                                                aria-labelledby="comment-tab">
                                             <table class="table table-hover">
                                                 <thead>
                                                 <tr>
-                                                    <th>User</th>
-                                                    <th>Activity</th>
-                                                    <th>Time</th>
-                                                    <th>Status</th>
-                                                    <th class="text-right"></th>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-3.jpg"
-                                                                                alt="activity-user">Silje Larsen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Dog the quick brown</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">10:23 AM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-purple">Delayed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-purple f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">3:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-2.jpg"
-                                                                                alt="activity-user">Albert Andersen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">Jumps over the lazy</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">2:37 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-red">Missed</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-red f-10"></i>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h6 class="m-0"><img class="rounded-circle  m-r-10"
-                                                                                style="width:40px;"
-                                                                                src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg"
-                                                                                alt="activity-user">Ida Jorgensen</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">The quick brown fox</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0">4:28 PM</h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 class="m-0 text-c-green">Done</h6>
-                                                    </td>
-                                                    <td class="text-right"><i class="fas fa-circle text-c-green f-10"></i>
-                                                    </td>
-                                                </tr>
+                                                {% for tweet in tweets|dictsortreversed:'comment_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
                                                 </tbody>
                                             </table>
                                         </div>

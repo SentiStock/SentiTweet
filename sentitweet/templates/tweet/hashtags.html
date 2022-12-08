@@ -25,7 +25,7 @@
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h2>{{companies|length}} Companies</h2>
+                                            <h2>{{hashtags|length}} Hashtags</h2>
                                         </div>
                                     </div>
                                 </div>
@@ -49,41 +49,36 @@
                                 <div class="col-xl-12 col-md-6">
                                     <div class="card Recent-Users">
                                         <div class="card-header">
-                                            <input class="form-control" type="text" placeholder="Search All Companies..." id="searchTable">
+                                            <input class="form-control" type="text" placeholder="Search All Hashtags..." id="searchTable">
                                         </div>
                                         <div class="card-block px-0 py-3">
                                             <div class="table-responsive">
                                                 <table id="listAllTable" class="table table-hover">
                                                     <tbody>
-                                                    {% for company in companies %}
+                                                    {% for hashtag in hashtags|slice:':100' %}
                                                         <tr class="unread">
                                                             <td>
-                                                                <a href="{{company.symbol}}/">
-                                                                    <img class="rounded-circle" style="width:40px;" src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg" alt="activity-user">
+                                                                <a href="{{hashtag.clean_value}}/">
+                                                                    <h6 class="mb-1" style="white-space: initial;">{{hashtag.value}}</h6>
+                                                                    {% comment %} <p class="m-0">{{company.symbol}}</p> {% endcomment %}
                                                                 </a>
                                                             </td>
                                                             <td>
-                                                                <a href="{{company.symbol}}/">
-                                                                    <h6 class="mb-1">{{company.name}}</h6>
-                                                                    <p class="m-0">{{company.symbol}}</p>
-                                                                </a>
+                                                                <h6 class="mb-1">{{hashtag.tweets.all|length}} Tweets</h6>
                                                             </td>
                                                             <td>
-                                                                <h6 class="mb-1">{{company.tweets.all|length}} Tweets</h6>
-                                                            </td>
-                                                            <td>
-                                                                <h6 class="mb-1">{{company.hashtags.all|length}} Hashtags</h6>
+                                                                <h6 class="mb-1">{{hashtag.sets.all|length}} Sets</h6>
                                                             </td>
                                                             <td>
                                                                 <h6 class="text-muted">
-                                                                    <i class={% if company.is_up_to_date %} "fas fa-circle text-c-green f-10 m-r-15" 
-                                                                    {% else%} "fas fa-circle text-c-red f-10 m-r-15" {% endif %}>
+                                                                    <i class={% if hashtag.is_up_to_date %} "fas fa-circle text-c-green f-10 m-r-15" 
+                                                                        {% else%} "fas fa-circle text-c-red f-10 m-r-15" {% endif %}>
                                                                     </i>
-                                                                    {{company.newest_tweet.post_date|timesince}}
+                                                                    {{hashtag.newest_tweet.post_date|timesince}}
                                                                 </h6>
                                                             </td>
                                                             <td>
-                                                                <h6 class="mb-1">{{company.favorites.all|length}} Followers</h6>
+                                                                <h6 class="mb-1">{{hashtag.favorites.all|length}} Followers</h6>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}

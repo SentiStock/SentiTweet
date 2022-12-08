@@ -2,7 +2,7 @@ import datetime
 
 from authentication.models import FavoritesModelMixin
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from tweet import models as tweet_models
 
@@ -61,3 +61,16 @@ class Company(FavoritesModelMixin):
     @property
     def top_twitter_users(self, top=10):
         return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def total_likes(self):
+        print(self.tweets.aggregate(Sum('like_number')))
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']

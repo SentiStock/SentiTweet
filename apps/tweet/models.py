@@ -1,8 +1,12 @@
+import datetime
+
 import pandas as pd
 from authentication.models import Contributor, FavoritesModelMixin
 from django.core import serializers
+from django.db.models import Sum
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 
 class PandasModelMixin(models.Model):
@@ -47,6 +51,23 @@ class TwitterUser(PandasModelMixin):
     @property
     def oldest_tweet(self):
         return self.tweets.order_by('-post_date').last()
+
+    @property
+    def is_up_to_date(self):
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+
+    @property
+    def total_likes(self):
+        print(self.tweets.aggregate(Sum('like_number')))
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
 
     def __str__(self):
         return self.name
@@ -97,6 +118,10 @@ class HashTag(FavoritesModelMixin):
     @property
     def oldest_tweet(self):
         return self.tweets.order_by('-post_date').last()
+
+    @property
+    def is_up_to_date(self):
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
         
     @property
     def twitter_users(self):
@@ -107,6 +132,19 @@ class HashTag(FavoritesModelMixin):
     @property
     def top_twitter_users(self, top=10):
         return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def total_likes(self):
+        print(self.tweets.aggregate(Sum('like_number')))
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
 
     def __str__(self):
         return self.value
@@ -143,6 +181,10 @@ class Set(FavoritesModelMixin):
         return self.tweets.order_by('-post_date').last()
 
     @property
+    def is_up_to_date(self):
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+
+    @property
     def twitter_users(self):
         twitter_user_ids = set(self.tweets.values_list('user_id', flat=True).distinct())
         return TwitterUser.objects.filter(id__in=twitter_user_ids)
@@ -150,6 +192,19 @@ class Set(FavoritesModelMixin):
     @property
     def top_twitter_users(self, top=10):
         return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def total_likes(self):
+        print(self.tweets.aggregate(Sum('like_number')))
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
 
     def __str__(self):
         return self.name
