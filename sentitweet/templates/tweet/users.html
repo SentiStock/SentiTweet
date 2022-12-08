@@ -1,0 +1,112 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+
+                                <!-- [ Info ] start -->
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h2>{{users|length}} Users</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            Some info
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h4>Something very interesting</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- [ Info ] end -->
+
+                                <!--[ Comapnies ] start-->
+                                <div class="col-xl-12 col-md-6">
+                                    <div class="card Recent-Users">
+                                        <div class="card-header">
+                                            <input class="form-control" type="text" placeholder="Search All Users..." id="searchTable">
+                                        </div>
+                                        <div class="card-block px-0 py-3">
+                                            <div class="table-responsive">
+                                                <table id="listAllTable" class="table table-hover">
+                                                    <tbody>
+                                                    {% for user in users|slice:':100' %}
+                                                        <tr class="unread">
+                                                            <td>
+                                                                <a href="{{user.id}}/">
+                                                                    <img class="rounded-circle" style="width:40px;" src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg" alt="activity-user">
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{user.id}}/">
+                                                                    <h6 class="mb-1" style="white-space: initial;">{{user.username}}</h6>
+                                                                    <p class="m-0">{{user.name}}</p>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <h6 class="mb-1">{{user.tweets.all|length}} Tweets</h6>
+                                                            </td>
+                                                            <td>
+                                                                <h6 class="mb-1">{{user.sets.all|length}} Sets</h6>
+                                                            </td>
+                                                            <td>
+                                                                <h6 class="text-muted">
+                                                                    <i class={% if user.is_up_to_date %} "fas fa-circle text-c-green f-10 m-r-15" 
+                                                                        {% else%} "fas fa-circle text-c-red f-10 m-r-15" {% endif %}>
+                                                                    </i>
+                                                                    {{user.newest_tweet.post_date|timesince}}
+                                                                </h6>
+                                                            </td>
+                                                            <td>
+                                                                <h6 class="mb-1">{{user.favorites.all|length}} Followers</h6>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--[ Comapnies ] end-->
+
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->            
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,8 +1,7 @@
 import os
-from sqlalchemy import create_engine
 
 from django.conf import settings
-
+from sqlalchemy import create_engine
 
 nasdaq_api = 'https://data.nasdaq.com/api/v3/datasets/WIKI/ORB.json?api_key=ytqghVKP6zuYXw8tLwxU'
 

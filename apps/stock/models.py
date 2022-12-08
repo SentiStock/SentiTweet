@@ -1,21 +1,76 @@
+import datetime
+
+from authentication.models import FavoritesModelMixin
 from django.db import models
+from django.db.models import Count, Q, Sum
+from django.utils import timezone
+from tweet import models as tweet_models
 
 from sentitweet.utils import get_sql_engine
 
 
-class Company(models.Model):
+class Company(FavoritesModelMixin):
     name = models.CharField(max_length=255)
     symbol = models.CharField(max_length=31)
+    market_cap = models.BigIntegerField(null=True, blank=True)
+    stock_price = models.IntegerField(null=True, blank=True)
+    country = models.CharField(max_length=63, null=True, blank=True)
+    twitter_query_set = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
+    def get_search_hashtags(self, top=10):
+        name = self.search_name
 
-class Stock(models.Model):
-    comapany = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='stocks')
-    date = models.DateField()
-    volume = models.PositiveIntegerField()
-    open = models.PositiveIntegerField()
-    close = models.PositiveIntegerField()
-    high = models.PositiveIntegerField()
-    low = models.PositiveIntegerField()
+        filtered_hashtags = self.hashtags.filter(
+            value__icontains=name
+        ).exclude(
+            Q(value__icontains=':')
+            | Q(value__icontains=')')
+            | Q(value__icontains='(')
+            | Q(value__icontains='"')
+        )
+        return filtered_hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    def get_top_hashtags(self, top=10):
+        return self.hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def search_name(self):
+        return self.name.split(' ')[0].split('.')[0]
+
+    @property
+    def newest_tweet(self):
+        return self.tweets.order_by('-post_date').first()
+
+    @property
+    def oldest_tweet(self):
+        return self.tweets.order_by('-post_date').last()
+
+    @property
+    def is_up_to_date(self):
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+
+    @property
+    def twitter_users(self):
+        return tweet_models.TwitterUser.objects.filter(
+            id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
+        )
+
+    @property
+    def top_twitter_users(self, top=10):
+        return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+
+    @property
+    def total_likes(self):
+        print(self.tweets.aggregate(Sum('like_number')))
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']

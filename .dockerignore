@@ -1,0 +1,6 @@
+# proper spelling is .dockerignore (not .Dockerignore)
+.git/
+.github/
+devops/
+Makefile
+README.md

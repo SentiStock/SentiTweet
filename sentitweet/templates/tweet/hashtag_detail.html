@@ -1,0 +1,298 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <!-- [ breadcrumb ] start -->
+
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h2>{{hashtag.value}}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h4>Tweet#: {{hashtag.tweets.all|length}}</h4>
+                                            <h4>Twitter users#: {{hashtag.twitter_users.all|length}}</h4>
+                                            <h4>Sets#: {{hashtag.sets.all|length}}</h4>
+                                            <h4>Followers#: {{hashtag.favorites.all|length}}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h4>Connected companies</h4>
+                                            {% for company in hashtag.companies.all %}
+                                                {{company}}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h4>Total Likes#: {{hashtag.total_likes}}</h4>
+                                            <h4>Total Retweets#: {{hashtag.total_retweets}}</h4>
+                                            <h4>Total Comments#: {{hashtag.total_comments}}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--[ Clusters ] start-->
+                                {% if clusters %}
+                                    <div class="col-xl-12 col-md-12 m-b-30">
+                                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                            {% for i in clusters %}
+                                                <li class="nav-item {% if forloop.counter == 1 %} active show {% endif %}">
+                                                    <a class="nav-link" id="event-{{forloop.counter}}-tab" data-toggle="tab" href="#event-{{forloop.counter}}" role="tab"
+                                                        aria-controls="event-{{forloop.counter}}" aria-selected="{% if forloop.counter == 1 %} true {% else %} false {% endif %}">Event {{forloop.counter}}</a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <div class="tab-content" id="myTabContent">
+                                        {% for top_word, best_tweets in clusters %}
+                                            <div class="tab-pane fade {% if forloop.counter == 1 %} active show {% endif %}" id="event-{{forloop.counter}}" role="tabpanel" aria-labelledby="event-{{forloop.counter}}-tab">
+                                                {% comment %} <hr/> {% endcomment %}
+                                                <h4>Top used words in this potential event</h4> 
+                                                <hr/>
+                                                <p>{% for word in top_word %} {% if not forloop.counter == 1 %} - {% endif %}{{word}} {% endfor %}</p>
+                                                <h4>Most representative tweets for this potential event</h4> 
+                                                {% for best_tweet in best_tweets %}
+                                                    <hr/>
+                                                    <p class="m-0 text-c-green" style="white-space: initial;">{{best_tweet}}</p>
+                                                {% endfor %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <!--[ Clusters ] end-->
+                                
+                                <!-- [ rating list ] starts-->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card user-list">
+                                        <div class="card-header">
+                                            <h5>Rating</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            <div class="row align-items-center justify-content-center m-b-20">
+                                                <div class="col-6">
+                                                    <h2 class="f-w-300 d-flex align-items-center float-left m-0">4.7 <i
+                                                            class="fas fa-star f-10 m-l-10 text-c-yellow"></i></h2>
+                                                </div>
+                                                <div class="col-6">
+                                                    <h6 class="d-flex  align-items-center float-right m-0">0.4 <i
+                                                            class="fas fa-caret-up text-c-green f-22 m-l-10"></i></h6>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xl-12">
+                                                    <h6 class="align-items-center float-left"><i
+                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>5</h6>
+                                                    <h6 class="align-items-center float-right">384</h6>
+                                                    <div class="progress m-t-30 m-b-20" style="height: 6px;">
+                                                        <div class="progress-bar progress-c-theme" role="progressbar"
+                                                                style="width: 70%;" aria-valuenow="70" aria-valuemin="0"
+                                                                aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xl-12">
+                                                    <h6 class="align-items-center float-left"><i
+                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>4</h6>
+                                                    <h6 class="align-items-center float-right">145</h6>
+                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                                        <div class="progress-bar progress-c-theme" role="progressbar"
+                                                                style="width: 35%;" aria-valuenow="35" aria-valuemin="0"
+                                                                aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xl-12">
+                                                    <h6 class="align-items-center float-left"><i
+                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>3</h6>
+                                                    <h6 class="align-items-center float-right">24</h6>
+                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                                        <div class="progress-bar progress-c-theme" role="progressbar"
+                                                                style="width: 25%;" aria-valuenow="25" aria-valuemin="0"
+                                                                aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xl-12">
+                                                    <h6 class="align-items-center float-left"><i
+                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>2</h6>
+                                                    <h6 class="align-items-center float-right">1</h6>
+                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                                        <div class="progress-bar progress-c-theme" role="progressbar"
+                                                                style="width: 10%;" aria-valuenow="10" aria-valuemin="0"
+                                                                aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xl-12">
+                                                    <h6 class="align-items-center float-left"><i
+                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>1</h6>
+                                                    <h6 class="align-items-center float-right">0</h6>
+                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
+                                                        <div class="progress-bar" role="progressbar" style="width:0;"
+                                                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- [ Best Tweets ] end-->
+                                <div class="col-xl-8 col-md-12 m-b-30">
+                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active show" id="like-tab" data-toggle="tab" href="#like" role="tab"
+                                                aria-controls="like" aria-selected="true">Most Liked Tweets</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="retweet-tab" data-toggle="tab"
+                                                href="#retweet" role="tab" aria-controls="retweet" aria-selected="false">Most Retweeted Tweets</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="comment-tab" data-toggle="tab" href="#comment"
+                                                role="tab" aria-controls="comment" aria-selected="false">Most Commented Tweets</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade active show" id="like" role="tabpanel" aria-labelledby="like-tab">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for tweet in tweets|dictsortreversed:'like_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                        <div class="tab-pane fade" id="retweet" role="tabpanel"
+                                                aria-labelledby="retweet-tab">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for tweet in tweets|dictsortreversed:'retweet_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                        <div class="tab-pane fade" id="comment" role="tabpanel"
+                                                aria-labelledby="comment-tab">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>Tweet</th>
+                                                    <th>Likes#</th>
+                                                    <th>Retweets#</th>
+                                                    <th>Comments#</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for tweet in tweets|dictsortreversed:'comment_number'|slice:':5' %}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.like_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.retweet_number}}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="m-0">{{tweet.comment_number}}</h6>
+                                                        </td>
+                                                        
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->            
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

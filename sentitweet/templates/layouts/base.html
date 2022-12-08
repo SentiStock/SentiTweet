@@ -21,6 +21,9 @@
           content="admin templates, bootstrap admin templates, bootstrap 4, dashboard, dashboard templets, sass admin templets, html admin templates, responsive, bootstrap admin templates free download,premium bootstrap admin templates, datta able, datta able bootstrap admin template, free admin theme, free dashboard template"/>
     <meta name="author" content="CodedThemes"/>
 
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" /> {% endcomment %}
+
     <!-- Favicon icon -->
     <link rel="icon" href="{{ ASSETS_ROOT }}/images/favicon.ico" type="image/x-icon">
     <!-- fontawesome icon -->
@@ -31,6 +34,8 @@
     <link rel="stylesheet" href="{{ ASSETS_ROOT }}/css/style.css">
     <!-- dark mode css -->
     <link rel="stylesheet" href="{{ ASSETS_ROOT }}/css/dark.css">
+
+    <link rel="stylesheet" href="{{ ASSETS_ROOT }}/css/sentitweet.css">
 
     <!-- Specific CSS goes HERE -->
     {% block stylesheets %}{% endblock stylesheets %}
@@ -56,6 +61,11 @@
     {% include 'includes/scripts.html' %}
 
     <!-- Specific Page JS goes HERE  -->
+    {% comment %} <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script> {% endcomment %}
+    <script src="{{ ASSETS_ROOT }}/js/sentitweet.js"></script>
+
     {% block javascripts %}{% endblock javascripts %}
 
 </body>
