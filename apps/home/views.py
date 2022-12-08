@@ -5,14 +5,19 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django import template
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
+from stock.models import Company
+from stock.utils import get_relevent_model_context
+from tweet.models import HashTag
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = {'segment': 'index'}
+    context = get_relevent_model_context()
+    context['segment'] = 'index'
 
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
@@ -20,11 +25,11 @@ def index(request):
 
 @login_required(login_url="/login/")
 def pages(request):
-    context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
-    try:
+    context = get_relevent_model_context()
 
+    try:
         load_template = request.path.split('/')[-1]
 
         if load_template == 'admin':
@@ -35,7 +40,6 @@ def pages(request):
         return HttpResponse(html_template.render(context, request))
 
     except template.TemplateDoesNotExist:
-
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
 

@@ -1,6 +1,7 @@
 ### Custom
 sentitweet/data/*
 database.bak
+db_backup.sql
 
 ###
 

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import nltk
 import numpy as np
 import pandas as pd
+import requests
+from django.conf import settings
 from nltk.corpus import stopwords
 from sklearn.cluster import MiniBatchKMeans
 from sklearn.decomposition import PCA
@@ -16,7 +18,15 @@ from tweet.models import HashTag, Tweet
 
 def get_sentiment(tweets):
     # TODO get tweet sentiment
-    pass
+    url = "https://sentitweetsentimentapi.azurewebsites.net/api/sentitweetsentiment"
+ 
+    headers = {"Content-Type": "application/json; charset=utf-8", "x-functions-key": settings.X_FUNCTION_KEY}
+    
+    data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
+    
+    response = requests.post(url, headers=headers, json=data)
+    print(response)
+    print(vars(response))
 
 def get_and_create_hashtags(tweets):
     for tweet in tweets:
@@ -156,12 +166,13 @@ def get_top_keywords(data, clusters, labels, n_terms):
     return key_words
 
 
-def cluster_tweets(tweets, max_k=10):
+def cluster_tweets(tweets, max_k=10, number_of_best_tweets=3):
     if not isinstance(tweets, pd.DataFrame):
         tweets = Tweet.as_dataframe(queryset=tweets)
 
     if len(tweets) == 0:
-        raise Exception(f'There are no tweets in this queryset...')
+        return None, {}
+        # raise Exception(f'There are no tweets in this queryset...')
         
     tweets.drop_duplicates(subset=["cleaned_text"], inplace=True)
     tweets.reset_index(inplace=True, drop=True)
@@ -176,7 +187,7 @@ def cluster_tweets(tweets, max_k=10):
     clusters = model_predict(model, text)
     tweets['cluster'] = clusters
 
-    best_tweets = get_most_repr_tweets(model, tweets, text)
+    best_tweets = get_most_repr_tweets(model, tweets, text, number_of_best_tweets)
     top_words = get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
 
     return best_tweets, top_words

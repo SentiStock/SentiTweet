@@ -12,14 +12,7 @@ bearer_token = os.getenv('TWITTER_BEARER_TOKEN')
 Client = tweepy.Client(bearer_token)#, return_type=dict)
 
 
-def process_api_response(response):
-    users_data = [[
-        user.id,
-        user.name,
-        user.username,
-        user.created_at,
-    ] for user in response.includes['users']]
-
+def process_api_tweets(response):
     tweets_data = [[
         tweet.id,
         tweet.text,
@@ -30,7 +23,7 @@ def process_api_response(response):
         tweet.public_metrics['reply_count'],
         tweet.public_metrics['retweet_count'],
         tweet.public_metrics['like_count'],
-    ] for tweet in response.data]
+    ] for tweet in response]
 
     tweets_df = pd.DataFrame(data=tweets_data, columns=[
         'id',
@@ -44,6 +37,20 @@ def process_api_response(response):
         'like_number'
     ])
 
+    tweets_df.drop_duplicates(subset=['id'], inplace=True)
+    tweets_df.reset_index(inplace=True, drop=True)
+
+    return tweets_df
+
+
+def process_api_users(response):
+    users_data = [[
+        user.id,
+        user.name,
+        user.username,
+        user.created_at
+    ] for user in response.data]
+
     users_df = pd.DataFrame(data=users_data, columns=[
         'id',
         'twitter_name',
@@ -51,10 +58,11 @@ def process_api_response(response):
         'created_at',
     ])
 
-    tweets_df.drop_duplicates(subset=['id'], inplace=True)
     users_df.drop_duplicates(subset=['id'], inplace=True)
+    users_df.reset_index(inplace=True, drop=True)
 
-    return tweets_df, users_df
+    return users_df
+
 
 def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None):
     tweets = []
@@ -101,32 +109,64 @@ def update_or_create_tweets_and_users_from_df(tweets_df, users_df, company=None)
     TwitterUser.objects.annotate(t_count=Count('tweets')).filter(t_count=0).delete()
 
 
-def get_tweets_by_hashtag(hashtag, MAX_TWEETS=100):
-    response = Client.search_recent_tweets(
+def get_users_by_ids(user_ids):
+    users_df = pd.DataFrame()
+
+    for i in range(0, len(user_ids), 100):
+        response = Client.get_users(
+            ids=user_ids[i:i+100],
+            user_fields=[
+                'created_at',
+                'description',
+                'entities',
+                'id',
+                'location',
+                'name',
+                'pinned_tweet_id',
+                'profile_image_url',
+                'protected',
+                'public_metrics',
+                'url',
+                'username',
+                'verified',
+                'withheld'
+            ],
+        )
+        users_df = pd.concat([users_df, process_api_users(response)], ignore_index=True)
+
+    return users_df
+
+
+def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
+    response = tweepy.Paginator(
+        Client.search_recent_tweets,
         query=f'{hashtag} new -is:retweet lang:en', 
         expansions=['author_id'],
-        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source', 'entities'], # TODO context_annotations # TODO A lot of info!!!
+        tweet_fields=['created_at', 'lang', 'author_id', 'public_metrics', 'source'],#, 'entities', 'context_annotations'], # TODO context_annotations # TODO A lot of info!!!
         user_fields=['created_at', 'username', 'name'],
-        since_id=None,
         sort_order='relevancy',
-        max_results=MAX_TWEETS,
-    )
+        max_results=100,
+    ).flatten(limit=MAX_TWEETS)
 
-    if response.meta['result_count'] == 0:
-        return pd.DataFrame(), pd.DataFrame()
-
-    return process_api_response(response)
+    return process_api_tweets(response)
 
 
 def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
     hashtags = company.get_search_hashtags(number_of_search_hashtags)
 
+    tweets_df = get_tweets_by_hashtag(company.search_name)
+
+    if not tweets_df.empty:
+        users_df = get_users_by_ids(list(tweets_df.user))
+        update_or_create_tweets_and_users_from_df(tweets_df, users_df, company)
+
     for hashtag in hashtags:
-        tweets_df, users_df = get_tweets_by_hashtag(hashtag)
+        tweets_df = get_tweets_by_hashtag(hashtag)
 
         if tweets_df.empty:
             continue
 
+        users_df = get_users_by_ids(list(tweets_df.user))
         update_or_create_tweets_and_users_from_df(tweets_df, users_df, company)
 
 
