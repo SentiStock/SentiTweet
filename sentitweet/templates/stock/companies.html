@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{%load plotly_dash%}
 
 {% block title %} Dashboard {% endblock %} 
 
@@ -20,6 +21,11 @@
                         <div class="page-wrapper">
                             <!-- [ Main Content ] start -->
                             <div class="row">
+                                <div class="col-md-6 col-xl-4">
+                                    {% autoescape off %}
+                                        {% plotly_app name="SimpleExample" %}
+                                    {% endautoescape %}
+                                </div>
 
                                 <!-- [ Info ] start -->
                                 <div class="col-md-6 col-xl-4">

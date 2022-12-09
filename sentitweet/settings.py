@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 
     'django_crontab',
 
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'channels',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -93,28 +96,28 @@ DATABASE_ENV = str(os.environ.get('DATABASE_ENV'))
 
 if DATABASE_ENV == 'production':
     database_name = os.environ.get('DATABASE_NAME')
-    user = os.environ.get('DATABASE_USERNAME')
-    password = os.environ.get('DATABASE_PASSWORD')
-    host = os.environ.get('DATABASE_HOST')
-    port = int(str(os.environ.get('DATABASE_PORT')))
+    database_user = os.environ.get('DATABASE_USERNAME')
+    database_password = os.environ.get('DATABASE_PASSWORD')
+    database_host = os.environ.get('DATABASE_HOST')
+    database_port = int(str(os.environ.get('DATABASE_PORT')))
 else:
     database_name = 'dbsentitweet'
-    user = 'sentitweet'
-    password = '12345'
-    host = 'postgres-db-sentitweet'
-    port = 5432
+    database_user = 'sentitweet'
+    database_password = '12345'
+    database_host = 'postgres-db-sentitweet'
+    database_port = 5432
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': database_name,
-        'USER': user,
-        'PASSWORD': password,
-        'HOST': host,
-        'PORT': port,
+        'USER': database_user,
+        'PASSWORD': database_password,
+        'HOST': database_host,
+        'PORT': database_port,
     }
 }
-SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'
+SQLALCHEMY_DATABASE_URL = f'postgresql://{database_user}:{database_password}@{database_host}:{database_port}/{database_name}'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -157,10 +160,49 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
+PLOTLY_COMPONENTS = [
+    'dash_core_components',
+    'dash_html_components',
+    'dash_bootstrap_components',
+    'dash_renderer',
+    'dpd_components',
+    # 'dpd_static_support',
+]
+# Staticfiles finders for locating dash app assets and related files (Dash static files)
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
+]
+
 # CRONJOBS
 CRONJOBS = [
     # Everyday at 02:00 we fetch new tweets from twitter for every company
     ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
+
+#Dash Plotly
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+REDIS_ENV = str(os.environ.get('REDIS_ENV'))
+if REDIS_ENV == 'production':
+    redis_host = os.environ.get('REDIS_HOST')
+    redis_port = int(os.environ.get('REDIS_PORT'))
+else:
+    redis_host = '127.0.0.1'
+    redis_port = 6379
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(redis_host, redis_port),],
+        },
+    },
+}
+
+ASGI_APPLICATION = 'sentitweet.routing.application'
 
 SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY=os.environ['SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY']
