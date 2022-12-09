@@ -146,6 +146,7 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
         user_fields=['created_at', 'username', 'name'],
         sort_order='relevancy',
         max_results=100,
+        # since={hashtag.newest_tweet.id},
     ).flatten(limit=MAX_TWEETS)
 
     return process_api_tweets(response)

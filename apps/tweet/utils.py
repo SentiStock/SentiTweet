@@ -20,7 +20,7 @@ def get_sentiment(tweets):
     # TODO get tweet sentiment
     url = "https://sentitweetsentimentapi.azurewebsites.net/api/sentitweetsentiment"
  
-    headers = {"Content-Type": "application/json; charset=utf-8", "x-functions-key": settings.X_FUNCTION_KEY}
+    headers = {"Content-Type": "application/json; charset=utf-8", "x-functions-key": settings.SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY}
     
     data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
     
