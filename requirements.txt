@@ -24,3 +24,5 @@ redis==4.4.0
 django-redis==5.2.0
 channels-redis==4.0.0
 dash-renderer==1.9.1
+
+jupyterlab==3.5.1

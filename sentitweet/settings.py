@@ -180,7 +180,7 @@ STATICFILES_FINDERS = [
 # CRONJOBS
 CRONJOBS = [
     # Everyday at 02:00 we fetch new tweets from twitter for every company
-    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+    # ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
 
 #Dash Plotly
