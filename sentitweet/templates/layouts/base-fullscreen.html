@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        Django Datta Able - {% block title %}{% endblock %} | AppSeed
+        SentiTweet - {% block title %}{% endblock %} | SentiStock
     </title>
     <!-- HTML5 Shim and Respond.js IE10 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -34,9 +34,18 @@
     {% block stylesheets %}{% endblock stylesheets %}
 
 </head>
-<body>
+<body style="background: #3f4d67;">
+
+    <img 
+        style="width:200px; float:left; margin-left:20px; margin-top:20px;"
+        src="{{ ASSETS_ROOT }}/images/logo_SentiTweet.png" 
+        alt="sentitweet-logo"
+    >
     
-    {% block content %}{% endblock content %}
+    <div class="align-items-center justify-content-center" style="position:absolute;  width: 100vw;">
+        {% block content %}{% endblock content %}
+    </div>
+    
 
     <!-- Enable the dark mode -->
     <label class="d-none">

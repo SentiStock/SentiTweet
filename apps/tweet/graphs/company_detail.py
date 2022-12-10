@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html
 from django_plotly_dash import DjangoDash
 
-app = DjangoDash('SimpleExample')
+app = DjangoDash('Comapny_detail')
 
 app.layout = html.Div([
     dcc.RadioItems(
