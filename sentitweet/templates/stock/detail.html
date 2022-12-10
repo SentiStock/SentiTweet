@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{%load plotly_dash%}
 
 {% block title %} Dashboard {% endblock %} 
 
@@ -18,6 +19,9 @@
                     <!-- [ breadcrumb ] end -->
                     <div class="main-body">
                         <div class="page-wrapper">
+                            <div style="height:400px; ">
+                                {% plotly_app name="Comapny_detail" ratio=0.4%}
+                            </div>
                             <!-- [ Main Content ] start -->
                             <div class="row">
                                 <div class="col-md-6 col-xl-4">

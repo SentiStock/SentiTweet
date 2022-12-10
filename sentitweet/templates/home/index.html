@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %} 
+{% block title %} Home {% endblock %} 
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -31,6 +31,23 @@
                                 > 
                                 </div>
                             </div> {% endcomment %}
+                             <!--[ Companies in our database ] start-->
+                             <div class="col-md-3 col-xl-12">
+                                <div class="card align-items-center">
+                                    <div class="card-block">
+                                        <span class="d-block text-uppercase">TOTAL CREATED ACCOUNTS</span>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0"><i
+                                                        class="feather icon-user text-c-blue f-30 m-r-10"></i>
+                                                        {{contributors|length}}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--[ Companies in our database ] end-->
                             <div class="row">
                                 <!--[ Companies in our database ] start-->
                                 <div class="col-md-3 col-xl-3">
@@ -53,7 +70,7 @@
                                 <div class="col-md-3 col-xl-3">
                                     <div class="card align-items-center">
                                         <div class="card-block">
-                                            <span class="d-block text-uppercase">ACTIVE USERS</span>
+                                            <span class="d-block text-uppercase">TWITTER USERS</span>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
                                                     <h3 class="f-w-300 d-flex align-items-center m-b-0"><i

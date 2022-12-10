@@ -1,36 +1,43 @@
 import dash
-from dash import dcc, html
+from dash import dcc, html, Input, Output
 from django_plotly_dash import DjangoDash
 
+import pandas as pd
+import plotly.express as px
+
+from stock.models import Company
+from tweet.models import Tweet
+
+#_company_related_tweets
+df = Tweet.as_dataframe(Company.objects.filter(symbol="AAPL").first().tweets.all())
 app = DjangoDash('Comapny_detail')
 
-app.layout = html.Div([
-    dcc.RadioItems(
-        id='dropdown-color',
-        options=[{'label': c, 'value': c.lower()} for c in ['Red', 'Green', 'Blue']],
-        value='red'
-    ),
-    html.Div(id='output-color'),
-    dcc.RadioItems(
-        id='dropdown-size',
-        options=[{'label': i,
-                  'value': j} for i, j in [('L','large'), ('M','medium'), ('S','small')]],
-        value='medium'
-    ),
-    html.Div(id='output-size')
+app.layout = html.Div(
+    [
+    dcc.Graph(id='company-detail-graph'),
+    dcc.Slider(
+        df['like_number'].min(),
+        df['like_number'].max(),
+        step=None,
+        value=df['like_number'].min(),
+        #marks={str(year): str(year) for year in df['year'].unique()},
+        id='like-slider'
+    )
+    ],
+    style={'height': "20vh"}
+)
 
-])
-
-@app.callback(
-    dash.dependencies.Output('output-color', 'children'),
-    [dash.dependencies.Input('dropdown-color', 'value')])
-def callback_color(dropdown_value):
-    return "The selected color is %s." % dropdown_value
 
 @app.callback(
-    dash.dependencies.Output('output-size', 'children'),
-    [dash.dependencies.Input('dropdown-color', 'value'),
-     dash.dependencies.Input('dropdown-size', 'value')])
-def callback_size(dropdown_color, dropdown_size):
-    return "The chosen T-shirt is a %s %s one." %(dropdown_size,
-                                                  dropdown_color)
+    Output('company-detail-graph', 'figure'),
+    Input('like-slider', 'value'))
+def update_figure(min_likes):
+    filtered_df = df[df.like_number >= min_likes]
+    display_df = filtered_df.groupby([df['post_date'].dt.date]).count()
+    fig = px.bar(
+        display_df, y="id",
+        title='Total number of Tweets on each day')
+
+    fig.update_layout(transition_duration=500)
+
+    return fig
