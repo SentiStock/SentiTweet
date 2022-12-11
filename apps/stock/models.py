@@ -36,6 +36,22 @@ class Company(FavoritesModelMixin):
 
     def get_top_hashtags(self, top=10):
         return self.hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+    
+    @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def hashtag_count(self):
+        return self.hashtags.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
 
     @property
     def search_name(self):
