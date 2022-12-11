@@ -41,6 +41,7 @@ def company_detail(request, company_symbol_or_name):
     context = get_relevent_model_context()
     context['company'] = company
     context['tweets'] = tweets
+    context['dash_context'] =  {'company_id': {'value': company.id}}
     context['clusters'] = get_cluster_context(tweets)
 
     return render(request, 'stock/detail.html', context)
