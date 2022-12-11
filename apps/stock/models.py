@@ -74,3 +74,16 @@ class Company(FavoritesModelMixin):
     @property
     def total_comments(self):
         return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+
+    def get_tweets(self, from_date_time=None, till_date_time=None):
+        if not from_date_time:
+            from_date_time = self.oldest_tweet.post_date
+        if not till_date_time:
+            till_date_time = self.newest_tweet.post_date
+        return self.tweets.filter(
+            Q(post_date__gte=from_date_time) & Q(post_date__lte=till_date_time)
+        )
+
+    def get_compound(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg']

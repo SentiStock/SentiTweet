@@ -19,29 +19,27 @@
                     <div class="main-body">
                         <div class="page-wrapper align-items-center">
                             <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <!--[ daily sales section ] start-->
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card daily-sales">
+                                        <div class="card-block">
+                                            <h6 class="mb-4">Daily Sales</h6>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i
+                                                            class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>$
+                                                        249.95</h3>
+                                                </div>
 
-                            {% comment %} <div class="col-md-3 align-items-center">
-                                    <img 
-                                    style="width:400px;   
-                                        display: block;
-                                        margin-left: auto;
-                                        margin-right: auto;"
-                                    src="{{ ASSETS_ROOT }}/images/big_logo_SentiTweet.png" 
-                                    alt="sentitweet-logo"
-                                > 
-                                </div>
-                            </div> {% endcomment %}
-                             <!--[ Companies in our database ] start-->
-                             <div class="col-md-3 col-xl-12">
-                                <div class="card align-items-center">
-                                    <div class="card-block">
-                                        <span class="d-block text-uppercase">TOTAL CREATED ACCOUNTS</span>
-                                        <div class="row d-flex align-items-center">
-                                            <div class="col-9">
-                                                <h3 class="f-w-300 d-flex align-items-center m-b-0"><i
-                                                        class="feather icon-user text-c-yellow f-30 m-r-10"></i>
-                                                        {{contributors|length}}
-                                                </h3>
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0">67%</p>
+                                                </div>
+                                            </div>
+                                            <div class="progress m-t-30" style="height: 7px;">
+                                                <div class="progress-bar progress-c-theme" role="progressbar"
+                                                        style="width: 50%;" aria-valuenow="50" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -56,9 +54,12 @@
                                             <span class="d-block text-uppercase">ANALYZED COMPANIES</span>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i class="far fa-building text-c-blue m-r-10"></i>
-                                                            {{companies|length}}
-                                                    </h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
+                                                            class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>$
+                                                        2.942.32</h3>
+                                                </div>
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0">36%</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -72,10 +73,12 @@
                                             <span class="d-block text-uppercase">TWITTER USERS</span>
                                             <div class="row d-flex align-items-center">
                                                 <div class="col-9">
-                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0"><i
-                                                            class="feather icon-user text-c-green f-30 m-r-10"></i>
-                                                            {{users|length}}
-                                                    </h3>
+                                                    <h3 class="f-w-300 d-flex align-items-center  m-b-0"><i
+                                                            class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>$
+                                                        8.638.32</h3>
+                                                </div>
+                                                <div class="col-3 text-right">
+                                                    <p class="m-b-0">80%</p>
                                                 </div>
                                             </div>
                                         </div>

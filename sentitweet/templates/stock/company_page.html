@@ -24,6 +24,11 @@
                             </div>
                             <!-- [ Main Content ] start -->
                             <div class="row">
+                                <div class="col-md-12 col-xl-12">
+                                    <div class="card">
+                                            {% plotly_app name="comapny_detail" initial_arguments=dash_context ratio=0.4%}
+                                    </div>
+                                </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
@@ -78,7 +83,6 @@
                                         <div class="tab-content" id="myTabContent">
                                         {% for top_word, best_tweets in clusters %}
                                             <div class="tab-pane fade {% if forloop.counter == 1 %} active show {% endif %}" id="event-{{forloop.counter}}" role="tabpanel" aria-labelledby="event-{{forloop.counter}}-tab">
-                                                {% comment %} <hr/> {% endcomment %}
                                                 <h4>Top used words in this potential event</h4> 
                                                 <hr/>
                                                 <p>{% for word in top_word %} {% if not forloop.counter == 1 %} - {% endif %}{{word}} {% endfor %}</p>
