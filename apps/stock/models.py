@@ -42,22 +42,6 @@ class Company(FavoritesModelMixin):
         return self.name.split(' ')[0].split('.')[0]
 
     @property
-    def tweet_count(self):
-        return self.tweets.count()
-
-    @property
-    def hashtag_count(self):
-        return self.hashtags.count()
-
-    @property
-    def twitter_user_count(self):
-        return self.twitter_users.count()
-
-    @property
-    def favorite_count(self):
-        return self.favorites.count()
-
-    @property
     def newest_tweet(self):
         return self.tweets.order_by('-post_date').first()
 
@@ -81,7 +65,6 @@ class Company(FavoritesModelMixin):
 
     @property
     def total_likes(self):
-        print(self.tweets.aggregate(Sum('like_number')))
         return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
 
     @property
@@ -94,16 +77,19 @@ class Company(FavoritesModelMixin):
 
     def get_tweets(self, from_date_time=None, till_date_time=None):
         if not from_date_time:
-            from_date_time = self.oldest_tweet.post_date
+            from_date_time = self.oldest_tweet.post_date if self.oldest_tweet else timezone.now()
         if not till_date_time:
-            till_date_time = self.newest_tweet.post_date
+            till_date_time = self.newest_tweet.post_date if self.newest_tweet else timezone.now()
         return self.tweets.filter(
             Q(post_date__gte=from_date_time) & Q(post_date__lte=till_date_time)
         )
 
     def get_compound(self, from_date_time=None, till_date_time=None):
         tweets = self.get_tweets(from_date_time, till_date_time)
-        return round(tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg'], 2)
+        compound = tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg']
+        if compound:
+            return round(compound, 2)
+        return 0
 
     def get_sentiment_label(self, from_date_time=None, till_date_time=None):
         compound = self.get_compound(from_date_time, till_date_time)

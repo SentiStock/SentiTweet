@@ -12,11 +12,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 import sys
 from pathlib import Path
+import pandas as pd
+
 
 import nltk
 from dotenv import load_dotenv
 
-nltk.download('stopwords') #FIXME should be removed
+nltk.download('stopwords')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_crontab',
-    'rest_framework',
 
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'channels',
@@ -180,48 +181,35 @@ STATICFILES_FINDERS = [
 
 # CRONJOBS
 CRONJOBS = [
-    # Everyday 15 minutes we fetch new tweets from twitter for every company
-    #('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
-    #('*/15 * * * *', 'sentitweet.cron.tweet_score_sentiment'),
+    # Everyday at 02:00 we fetch new tweets from twitter for every company
+    # ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
 
-
-# REST_FRAMEWORK
-# REST_FRAMEWORK = {
-#     # Use Django's standard `django.contrib.auth` permissions,
-#     # or allow read-only access for unauthenticated users.
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-#     ]
-# }
-
-
-# Dash Plotly
+#Dash Plotly
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
+REDIS_ENV = str(os.environ.get('REDIS_ENV'))
+if REDIS_ENV == 'production':
+    redis_host = os.environ.get('REDIS_HOST')
+    redis_port = int(os.environ.get('REDIS_PORT'))
+else:
+    redis_host = '127.0.0.1'
+    redis_port = 6379
 
-# Redis
-# REDIS_ENV = str(os.environ.get('REDIS_ENV'))
-# if REDIS_ENV == 'production':
-#     redis_host = os.environ.get('REDIS_HOST')
-#     redis_port = int(os.environ.get('REDIS_PORT'))
-# else:
-#     redis_host = '127.0.0.1'
-#     redis_port = 6379
-
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [(redis_host, redis_port),],
-#         },
-#     },
-# }
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(redis_host, redis_port),],
+        },
+    },
+}
 
 ASGI_APPLICATION = 'sentitweet.routing.application'
 
-SENTITWEETAPI_SENTIMENT_URL = os.environ.get('SENTITWEETAPI_SENTIMENT_URL')
-SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY= os.environ.get('SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY')
+SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY=os.environ['SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY']
 
 SENTIMENT_COMPOUND_TRHESHOLD = 0.2
 DAYS_TILL_TWEETS_ARE_OUTDATED = 7
+
+pd.options.plotting.backend = "plotly"

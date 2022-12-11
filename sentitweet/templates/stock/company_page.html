@@ -15,19 +15,14 @@
             <div class="pcoded-content">
                 <div class="pcoded-inner-content">
                     <!-- [ breadcrumb ] start -->
-                    {% plotly_app name="comapny_detail" initial_arguments=dash_context ratio=0.4%}
+                    {% plotly_app name="comapny_detail" initial_arguments=dash_context ratio=0.56%}
 
 
-                    <!-- [ breadcrumb ] end -->
+                    {% comment %} <!-- [ breadcrumb ] end -->
                     <div class="main-body">
                         <div class="page-wrapper">
                             <!-- [ Main Content ] start -->
                             <div class="row">
-                                {% comment %} <div class="col-md-12 col-xl-12">
-                                    <div class="card">
-                                            {% plotly_app name="comapny_detail" initial_arguments=dash_context ratio=0.4%}
-                                    </div>
-                                </div> {% endcomment %}
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
@@ -223,7 +218,7 @@
                             </div>
                             <!-- [ Main Content ] end -->
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
             </div>
 
