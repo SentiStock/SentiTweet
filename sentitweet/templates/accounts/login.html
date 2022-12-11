@@ -12,16 +12,18 @@
                 <span class="r s"></span>
                 <span class="r"></span>
             </div>
-            <div class="card">
+            <div class="card" style="border-radius: 25px;">
                 <div class="card-body text-center">
-
+                    <div class="mb-1">
+                        <i class="feather icon-user auth-icon"></i>
+                    </div>
                     <h3 class="mb-4">Login</h3>
 
                     <span class="mb-0 text-muted">
                         {% if msg %}
                             <span class="text-danger">{{ msg | safe }}</span>
                         {% else %}
-                            Add your credentials
+                            Add your SentiTweet credentials
                         {% endif %} 
                     </span>
 

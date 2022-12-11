@@ -1,6 +1,5 @@
 import datetime
 
-import pandas as pd
 from authentication.models import Contributor, FavoritesModelMixin
 from django.core import serializers
 from django.db.models import Sum
@@ -8,26 +7,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-
-class PandasModelMixin(models.Model):
-    @classmethod
-    def as_dataframe(cls, queryset=None, field_list=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        if field_list is None:
-            field_list = [_field.name for _field in cls._meta._get_fields(reverse=False)]
-
-        data = []
-        [data.append([obj.serializable_value(column) for column in field_list]) for obj in queryset]
-
-        columns = field_list
-
-        df = pd.DataFrame(data, columns=columns)
-        return df
-
-    class Meta:
-        abstract = True
-
+from home.models import PandasModelMixin
 
 class TwitterUser(PandasModelMixin):
     id = models.BigIntegerField(primary_key=True)

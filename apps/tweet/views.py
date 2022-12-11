@@ -44,7 +44,7 @@ def hashtag_detail(request, hashtag_value):
     context['tweets'] = tweets
     context['clusters'] = get_cluster_context(tweets)
 
-    return render(request, 'tweet/hashtag_detail.html', context)
+    return render(request, 'tweet/hashtag_company_page.html', context)
 
 
 @login_required(login_url="/login/")
@@ -78,7 +78,7 @@ def set_detail_view(request, id):
     context['tweets'] = tweets
     context['clusters'] = get_cluster_context(tweets)
 
-    return render(request, 'tweet/set_detail.html', context)
+    return render(request, 'tweet/set_company_page.html', context)
 
 @login_required(login_url="/login/")
 def set_create(request): 
@@ -130,4 +130,4 @@ def user_detail(request, id):
     context['tweets'] = tweets
     context['clusters'] = get_cluster_context(tweets)
 
-    return render(request, 'tweet/user_detail.html', context)
+    return render(request, 'tweet/user_company_page.html', context)

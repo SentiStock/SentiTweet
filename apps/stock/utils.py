@@ -1,6 +1,6 @@
 from django.db.models import Count, Q
 from stock.models import Company
-from tweet.models import HashTag, Set, TwitterUser
+from tweet.models import HashTag, Set, TwitterUser, Contributor
 from tweet.utils import cluster_tweets
 
 
@@ -27,8 +27,9 @@ def get_relevent_model_context():
     hashtags = HashTag.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
     users = TwitterUser.objects.all().annotate(t_count=Count('tweets')).order_by('-t_count')
     sets = Set.objects.filter(mode='public')#.order_by('followers')
+    contributors = Contributor.objects.all()
 
-    return {'sets': sets, 'companies': companies, 'hashtags': hashtags, 'users': users}
+    return {'sets': sets, 'companies': companies, 'hashtags': hashtags, 'users': users, 'contributors': contributors}
 
 
 def get_cluster_context(tweets):

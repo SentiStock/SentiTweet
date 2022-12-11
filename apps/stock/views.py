@@ -43,4 +43,19 @@ def company_detail(request, company_symbol_or_name):
     context['tweets'] = tweets
     context['clusters'] = get_cluster_context(tweets)
 
-    return render(request, 'stock/detail.html', context)
+    return render(request, 'stock/company_page.html', context)
+
+
+@login_required(login_url="/login/")
+def discover(request):
+    #context = get_relevent_model_context()
+    context = {}
+    html_template = loader.get_template('stock/discover.html')
+    return HttpResponse(html_template.render(context, request))
+
+@login_required(login_url="/login/")
+def trends(request):
+    #context = get_relevent_model_context()
+    context = {}
+    html_template = loader.get_template('stock/trends.html')
+    return HttpResponse(html_template.render(context, request))

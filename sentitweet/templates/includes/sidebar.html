@@ -6,7 +6,7 @@
                 <div class="b-bg">
                     <i class="feather icon-trending-up"></i>
                 </div>
-                <span class="b-title">Senti Tweet</span>
+                <span class="b-title">SentiTweet</span>
             </a>
             <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
         </div>
@@ -30,7 +30,7 @@
                 <li class="nav-item">
                     <a href="javascript:" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-search"></i></span>
-                        <input type="text" id="m-search" class="pcoded-mtext" placeholder="Search...">
+                        <input type="text" id="m-search" class="pcoded-mtext" style="border: none; background:none; caret-color: #ffffff; color:#ffffff;" placeholder="Search...">
                     </a>
                 </li>
 
@@ -43,13 +43,13 @@
                             class="pcoded-mtext">Home</span></a>
                 </li> 
                 <li data-username="dashboard discover" 
-                    class="nav-item">
-                    <a href="/" class="nav-link "><span class="pcoded-micon"><i class="feather icon-loader"></i></span><span
+                    class="nav-item {% if 'discover' in segment %} active {% endif %}">
+                    <a href="/discover" class="nav-link "><span class="pcoded-micon"><i class="feather icon-loader"></i></span><span
                             class="pcoded-mtext">Discover</span></a>
                 </li>
                 <li data-username="dashboard trends" 
-                    class="nav-item">
-                    <a href="/" class="nav-link "><span class="pcoded-micon"><i class="feather icon-trending-up"></i></span><span
+                    class="nav-item {% if 'trends' in segment %} active {% endif %}">
+                    <a href="/trends" class="nav-link "><span class="pcoded-micon"><i class="feather icon-trending-up"></i></span><span
                             class="pcoded-mtext">Trends</span></a>
                 </li>
 
@@ -58,7 +58,7 @@
                 </li>
                 <li data-username="companies company"
                     class="nav-item pcoded-hasmenu ">
-                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span><span
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="far fa-building"></i></i></span><span
                             class="pcoded-mtext">Companies</span></a>
                     <ul class="pcoded-submenu">
                         <li class=""><a href="/companies/" class="">All Companies</a></li>
@@ -219,7 +219,7 @@
                     </ul>
                 </li>{% endcomment %}
 
-                <li class="nav-item pcoded-menu-caption">
+                {% comment %} <li class="nav-item pcoded-menu-caption">
                     <label>Help</label>
                 </li>                    
                 <li data-username="Support Page" class="nav-item ">
@@ -229,7 +229,7 @@
                         </span>
                         <span class="pcoded-mtext">Support</span>
                     </a>
-                </li>
+                </li> {% endcomment %}
 
             </ul>
         </div>

@@ -180,7 +180,7 @@ STATICFILES_FINDERS = [
 # CRONJOBS
 CRONJOBS = [
     # Everyday at 02:00 we fetch new tweets from twitter for every company
-    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+    # ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
 ]
 
 #Dash Plotly
@@ -194,14 +194,14 @@ else:
     redis_host = '127.0.0.1'
     redis_port = 6379
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(redis_host, redis_port),],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [(redis_host, redis_port),],
+#         },
+#     },
+# }
 
 ASGI_APPLICATION = 'sentitweet.routing.application'
 

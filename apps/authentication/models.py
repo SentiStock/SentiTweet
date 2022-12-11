@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 
+from home.models import PandasModelMixin
 
 class Favorite(models.Model):
     user = models.ForeignKey('authentication.Contributor', related_name='favorites', on_delete=models.CASCADE)
@@ -24,7 +25,7 @@ class Favorite(models.Model):
         ordering = ['favorite_ct']
 
 
-class FavoritesModelMixin(models.Model):
+class FavoritesModelMixin(PandasModelMixin):
     @property
     def favorites(self):
         return Favorite.objects.filter(
