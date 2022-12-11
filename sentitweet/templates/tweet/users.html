@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %} 
+{% block title %} Users {% endblock %} 
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -22,24 +22,27 @@
                             <div class="row">
 
                                 <!-- [ Info ] start -->
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card">
+                                <div class="col-md-3 col-xl-3">
+                                    <div class="card align-items-center">
                                         <div class="card-block">
-                                            <h2>{{users|length}} Users</h2>
+                                            <span class="d-block text-uppercase">TWITTER USERS</span>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-user text-c-green f-30 m-r-10"></i>
+                                                            {{users|length}}
+                                                    </h3>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-xl-4">
+                                <div class="col-md-6 col-xl-8">
                                     <div class="card">
                                         <div class="card-block">
-                                            Some info
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h4>Something very interesting</h4>
+                                            <h4>You can filter the users in the search pane.</h4>
+                                            <span>When you click on them you will go to the detailed user page.</span>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -49,30 +52,38 @@
                                 <div class="col-xl-12 col-md-6">
                                     <div class="card Recent-Users">
                                         <div class="card-header">
-                                            <input class="form-control" type="text" placeholder="Search All Users..." id="searchTable">
+                                            <input class="form-control" type="text" placeholder="Search All TwitterUsers..." id="searchTableTwitterUsers">
                                         </div>
                                         <div class="card-block px-0 py-3">
                                             <div class="table-responsive">
-                                                <table id="listAllTable" class="table table-hover">
+                                                <table id="listAllTableTwitterUsers" class="table table-hover">
                                                     <tbody>
-                                                    {% for user in users|slice:':100' %}
+                                                        <tr>
+                                                            <th ></th>
+                                                            <th >Users</th>
+                                                            {% comment %} <th colspan="2">Company name</th> {% endcomment %}
+                                                            <th>Total Tweets</th>
+                                                            <th>Created sets</th>
+                                                            <th>Last updated</th>
+                                                            <th>Total Followers</th>
+                                                        </tr>
+                                                        {% for user in users|slice:':100' %}
                                                         <tr class="unread">
                                                             <td>
                                                                 <a href="{{user.id}}/">
-                                                                    <img class="rounded-circle" style="width:40px;" src="{{ ASSETS_ROOT }}/images/user/avatar-1.jpg" alt="activity-user">
+                                                                    <i class="feather icon-user text-c-green f-30 m-r-10"></i>
                                                                 </a>
                                                             </td>
                                                             <td>
                                                                 <a href="{{user.id}}/">
                                                                     <h6 class="mb-1" style="white-space: initial;">{{user.username}}</h6>
-                                                                    <p class="m-0">{{user.name}}</p>
                                                                 </a>
                                                             </td>
                                                             <td>
                                                                 <h6 class="mb-1">{{user.tweets.all|length}} Tweets</h6>
                                                             </td>
                                                             <td>
-                                                                <h6 class="mb-1">{{user.sets.all|length}} Sets</h6>
+                                                                <h6 class="mb-1">{{user.verified}} IsVerified</h6>
                                                             </td>
                                                             <td>
                                                                 <h6 class="text-muted">

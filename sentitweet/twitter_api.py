@@ -179,5 +179,5 @@ def update_tweets(tweets):
         user_fields=['created_at', 'username', 'name'],
     )
 
-    tweets_df, users_df = process_api_response(response)
+    tweets_df, users_df = process_api_response(response) #FIXME
     update_or_create_tweets_and_users_from_df(tweets_df, users_df)

@@ -14,10 +14,15 @@ lib/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+notebooks/
 
 # Environmental vars
 .env
 .env-bak
+
+.env-remote
+.env-local
+.env-production
 
 #Environments
 .venv

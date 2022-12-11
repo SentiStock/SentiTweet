@@ -51,5 +51,5 @@ db-backup:
 	@$(docker_db) pg_dump -U postgres dbsentitweet > db_backup.sql
 
 .PHONY: install-requirements
-install: # Execute migrate command in sentitweet container
+install-requirements: # Execute migrate command in sentitweet container
 	@$(docker_web) pip install -r /app/requirements.txt

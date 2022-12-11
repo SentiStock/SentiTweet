@@ -6,8 +6,14 @@ from django.urls import include, path
 # from stock.graphs import *
 from tweet.graphs import *
 
+from sentitweet.api import search_all_objects, toggle_favorite
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
+
+    path('api/search/', search_all_objects),
+    path('api/favorite/', toggle_favorite),
     path('django_plotly_dash/', include('django_plotly_dash.urls')),
 
     path('', include('stock.urls')),

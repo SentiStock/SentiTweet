@@ -1,3 +1,4 @@
+import json
 import os
 
 import matplotlib.cm as cm
@@ -17,16 +18,29 @@ from tweet.models import HashTag, Tweet
 
 
 def get_sentiment(tweets):
-    # TODO get tweet sentiment
-    url = "https://sentitweetsentimentapi.azurewebsites.net/api/sentitweetsentiment"
- 
-    headers = {"Content-Type": "application/json; charset=utf-8", "x-functions-key": settings.SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY}
+    headers = {
+        "Content-Type": "application/json; charset=utf-8", 
+        "x-functions-key": settings.SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY
+    }
     
     data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
     
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(settings.SENTITWEETAPI_SENTIMENT_URL, headers=headers, json=data)
     print(response)
-    print(vars(response))
+    for scored_tweet in json.loads(response._content):
+        try:
+            tweet_to_score = tweets.get(id=scored_tweet[0])
+            tweet_to_score.sentiment_positive = scored_tweet[1]['positive']
+            tweet_to_score.sentiment_negative = scored_tweet[1]['negative']
+            tweet_to_score.sentiment_neutral = scored_tweet[1]['neutral']
+            tweet_to_score.sentiment_compound = scored_tweet[1]['compound']
+            tweet_to_score.sentiment_uncertain = scored_tweet[1]['uncertain']
+            tweet_to_score.save()
+        except Exception as e:
+            continue
+    
+    return tweets
+        
 
 def get_and_create_hashtags(tweets):
     for tweet in tweets:

@@ -23,27 +23,40 @@
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h2>{{user.username}}</h2>
+                                            <h2>{{hashtag.value}}</h2>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h3>Tweet#: {{user.tweets.all|length}}</h3>
-                                            <h3>Followers#: {{user.favorites.all|length}}</h3>
+                                            <h4>Tweet#: {{hashtag.tweets.all|length}}</h4>
+                                            <h4>Twitter users#: {{hashtag.twitter_users.all|length}}</h4>
+                                            <h4>Sets#: {{hashtag.sets.all|length}}</h4>
+                                            <h4>Followers#: {{hashtag.favorites.all|length}}</h4>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-4">
                                     <div class="card">
                                         <div class="card-block">
-                                            <h4>Total Likes#: {{user.total_likes}}</h4>
-                                            <h4>Total Retweets#: {{user.total_retweets}}</h4>
-                                            <h4>Total Comments#: {{user.total_comments}}</h4>
+                                            <h4>Connected companies</h4>
+                                            {% for company in hashtag.companies.all %}
+                                                {{company}}
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h4>Total Likes#: {{hashtag.total_likes}}</h4>
+                                            <h4>Total Retweets#: {{hashtag.total_retweets}}</h4>
+                                            <h4>Total Comments#: {{hashtag.total_comments}}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!--[ Clusters ] start-->
                                 {% if clusters %}
                                     <div class="col-xl-12 col-md-12 m-b-30">
@@ -74,78 +87,8 @@
                                 {% endif %}
                                 <!--[ Clusters ] end-->
                                 
-                                <!-- [ rating list ] starts-->
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card user-list">
-                                        <div class="card-header">
-                                            <h5>Rating</h5>
-                                        </div>
-                                        <div class="card-block">
-                                            <div class="row align-items-center justify-content-center m-b-20">
-                                                <div class="col-6">
-                                                    <h2 class="f-w-300 d-flex align-items-center float-left m-0">4.7 <i
-                                                            class="fas fa-star f-10 m-l-10 text-c-yellow"></i></h2>
-                                                </div>
-                                                <div class="col-6">
-                                                    <h6 class="d-flex  align-items-center float-right m-0">0.4 <i
-                                                            class="fas fa-caret-up text-c-green f-22 m-l-10"></i></h6>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-xl-12">
-                                                    <h6 class="align-items-center float-left"><i
-                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>5</h6>
-                                                    <h6 class="align-items-center float-right">384</h6>
-                                                    <div class="progress m-t-30 m-b-20" style="height: 6px;">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width: 70%;" aria-valuenow="70" aria-valuemin="0"
-                                                                aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xl-12">
-                                                    <h6 class="align-items-center float-left"><i
-                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>4</h6>
-                                                    <h6 class="align-items-center float-right">145</h6>
-                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width: 35%;" aria-valuenow="35" aria-valuemin="0"
-                                                                aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xl-12">
-                                                    <h6 class="align-items-center float-left"><i
-                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>3</h6>
-                                                    <h6 class="align-items-center float-right">24</h6>
-                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width: 25%;" aria-valuenow="25" aria-valuemin="0"
-                                                                aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xl-12">
-                                                    <h6 class="align-items-center float-left"><i
-                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>2</h6>
-                                                    <h6 class="align-items-center float-right">1</h6>
-                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
-                                                        <div class="progress-bar progress-c-theme" role="progressbar"
-                                                                style="width: 10%;" aria-valuenow="10" aria-valuemin="0"
-                                                                aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-xl-12">
-                                                    <h6 class="align-items-center float-left"><i
-                                                            class="fas fa-star f-10 m-r-10 text-c-yellow"></i>1</h6>
-                                                    <h6 class="align-items-center float-right">0</h6>
-                                                    <div class="progress m-t-30  m-b-20" style="height: 6px;">
-                                                        <div class="progress-bar" role="progressbar" style="width:0;"
-                                                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- [ Best Tweets ] end-->
+                               
+                                <!-- [ Best Tweets ] start-->
                                 <div class="col-xl-8 col-md-12 m-b-30">
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                                         <li class="nav-item">
@@ -176,7 +119,9 @@
                                                 {% for tweet in tweets|dictsortreversed:'like_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>
@@ -209,7 +154,9 @@
                                                 {% for tweet in tweets|dictsortreversed:'retweet_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>
@@ -242,7 +189,9 @@
                                                 {% for tweet in tweets|dictsortreversed:'comment_number'|slice:':5' %}
                                                     <tr>
                                                         <td>
-                                                            <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            <a href="/users/{{tweet.user.id}}/">
+                                                                <p class="m-0 text-c-green" style="white-space: initial;">{{tweet.text}}</p>
+                                                            </a>
                                                         </td>
                                                         <td>
                                                             <h6 class="m-0">{{tweet.like_number}}</h6>

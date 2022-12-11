@@ -12,18 +12,20 @@
                 <span class="r s"></span>
                 <span class="r"></span>
             </div>
-            <div class="card">
+            <div class="card" style="border-radius: 25px;">
                 <div class="card-body text-center">
-                    <div class="mb-4">
+                    <div class="mb-1">
                         <i class="feather icon-user-plus auth-icon"></i>
                     </div>
                     <h3 class="mb-4">Sign up</h3>
 
                     <span class="mb-0 text-muted">
-                        {% if msg %}
+                        {% if msg and success %}
+                            <span class="text-success">{{ msg | safe }}</span>
+                        {% elif msg %}
                             <span class="text-danger">{{ msg | safe }}</span>
                         {% else %}
-                            Add your credentials
+                            Make an account in SentiTweet!
                         {% endif %} 
                     </span>
 
@@ -33,7 +35,7 @@
                     <!-- Hide the form on success -->
                     {% if success %}
 
-                        <a href="{% url 'login' %}" class="btn btn-primary shadow-2 mb-4">Sign IN</a>
+                        <a href="{% url 'login' %}" class="btn btn-primary mb-4">Sign In</a>
 
                     {% else %}
 

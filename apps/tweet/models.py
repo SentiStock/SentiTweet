@@ -1,33 +1,14 @@
 import datetime
 
-import pandas as pd
 from authentication.models import Contributor, FavoritesModelMixin
+from django.conf import settings
 from django.core import serializers
-from django.db.models import Sum
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils import timezone
 
-
-class PandasModelMixin(models.Model):
-    @classmethod
-    def as_dataframe(cls, queryset=None, field_list=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        if field_list is None:
-            field_list = [_field.name for _field in cls._meta._get_fields(reverse=False)]
-
-        data = []
-        [data.append([obj.serializable_value(column) for column in field_list]) for obj in queryset]
-
-        columns = field_list
-
-        df = pd.DataFrame(data, columns=columns)
-        return df
-
-    class Meta:
-        abstract = True
-
+from home.models import PandasModelMixin
 
 class TwitterUser(PandasModelMixin):
     id = models.BigIntegerField(primary_key=True)
@@ -45,6 +26,14 @@ class TwitterUser(PandasModelMixin):
     # Withheld TODO
 
     @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
+
+    @property
     def newest_tweet(self):
         return self.tweets.order_by('-post_date').first()
 
@@ -54,7 +43,7 @@ class TwitterUser(PandasModelMixin):
 
     @property
     def is_up_to_date(self):
-        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(settings.DAYS_TILL_TWEETS_ARE_OUTDATED)) if self.newest_tweet else False
 
     @property
     def total_likes(self):
@@ -98,6 +87,14 @@ class Tweet(PandasModelMixin):
     sentiment_compound = models.DecimalField(null=True, blank=True, 
         validators=[MinValueValidator(-1), MaxValueValidator(1)], decimal_places=4, max_digits=5)
 
+    @property
+    def sentiment_label(self):
+        if self.sentiment_compound > settings.SENTIMENT_COMPOUND_TRHESHOLD:
+            return 'positive'
+        if self.sentiment_compound < settings.SENTIMENT_COMPOUND_TRHESHOLD * -1:
+            return 'negative'
+        return 'neutral'
+
     def __str__(self):
         return str(self.id)
 
@@ -106,6 +103,22 @@ class HashTag(FavoritesModelMixin):
     tweets = models.ManyToManyField(Tweet, related_name='hashtags')
     companies = models.ManyToManyField('stock.Company', related_name='hashtags')
     value = models.CharField(max_length=255)
+
+    @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
+    
+    @property
+    def set_count(self):
+        return self.sets.count()
 
     @property
     def clean_value(self):
@@ -121,7 +134,7 @@ class HashTag(FavoritesModelMixin):
 
     @property
     def is_up_to_date(self):
-        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(settings.DAYS_TILL_TWEETS_ARE_OUTDATED)) if self.newest_tweet else False
         
     @property
     def twitter_users(self):
@@ -135,7 +148,6 @@ class HashTag(FavoritesModelMixin):
 
     @property
     def total_likes(self):
-        print(self.tweets.aggregate(Sum('like_number')))
         return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
 
     @property
@@ -182,7 +194,7 @@ class Set(FavoritesModelMixin):
 
     @property
     def is_up_to_date(self):
-        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(settings.DAYS_TILL_TWEETS_ARE_OUTDATED)) if self.newest_tweet else False
 
     @property
     def twitter_users(self):
