@@ -18,7 +18,7 @@ import pandas as pd
 import nltk
 from dotenv import load_dotenv
 
-nltk.download('stopwords') #FIXME to deltete
+nltk.download('stopwords') #FIXME //
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -153,9 +153,9 @@ USE_TZ = True
 
 # Static and Media files
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-ASSETS_ROOT = '/static/assets'
+ASSETS_ROOT = os.path.join(BASE_DIR, 'static/assets') #?
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.

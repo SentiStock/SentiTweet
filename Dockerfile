@@ -18,9 +18,9 @@ WORKDIR /app/
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-EXPOSE 80
+EXPOSE 80 8888
 
 # Add our python cronjobs to machine cronjobs
 # Start cron
 # Run the server
-CMD python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:80 && gunicorn --bind 0.0.0.0:80 sentitweet.backend.wsgi
+CMD  python manage.py collectstatic --noinput && python manage.py crontab add && cron && python manage.py runserver 0.0.0.0:80 && gunicorn --bind 0.0.0.0:80 sentitweet.backend.wsgi
