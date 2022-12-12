@@ -1,6 +1,5 @@
 import datetime
 
-import pandas as pd
 from authentication.models import Contributor, FavoritesModelMixin
 from django.conf import settings
 from django.core import serializers
@@ -9,26 +8,7 @@ from django.db import models
 from django.db.models import Avg, Count, Q, Sum
 from django.utils import timezone
 
-
-class PandasModelMixin(models.Model):
-    @classmethod
-    def as_dataframe(cls, queryset=None, field_list=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        if field_list is None:
-            field_list = [_field.name for _field in cls._meta._get_fields(reverse=False)]
-
-        data = []
-        [data.append([obj.serializable_value(column) for column in field_list]) for obj in queryset]
-
-        columns = field_list
-
-        df = pd.DataFrame(data, columns=columns)
-        return df
-
-    class Meta:
-        abstract = True
-
+from home.models import PandasModelMixin
 
 class TwitterUser(PandasModelMixin):
     id = models.BigIntegerField(primary_key=True)
@@ -151,6 +131,22 @@ class HashTag(FavoritesModelMixin):
     tweets = models.ManyToManyField(Tweet, related_name='hashtags')
     companies = models.ManyToManyField('stock.Company', related_name='hashtags')
     value = models.CharField(max_length=255)
+
+    @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
+
+    @property
+    def set_count(self):
+        return self.sets.count()
 
     @property
     def clean_value(self):
