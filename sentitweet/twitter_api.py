@@ -1,9 +1,11 @@
+import datetime
 import os
 
 import pandas as pd
 import tweepy
 from django.db.models import Count
-from tweet.models import Tweet, TwitterUser
+from django.utils import timezone
+from tweet.models import HashTag, Tweet, TwitterUser
 from tweet.utils import clean_tweet_text, get_and_create_hashtags
 
 from sentitweet.utils import create_from_df
@@ -138,6 +140,13 @@ def get_users_by_ids(user_ids):
 
 
 def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
+    if isinstance(hashtag, HashTag):
+        since = hashtag.newest_tweet.id if hashtag.newest_tweet else None
+        if since < (timezone.now() - datetime.timedelta(days=6)).timestamp():
+            since = None
+    else:
+        since = None
+
     response = tweepy.Paginator(
         Client.search_recent_tweets,
         query=f'{hashtag} new -is:retweet lang:en', 
@@ -146,7 +155,7 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
         user_fields=['created_at', 'username', 'name'],
         sort_order='relevancy',
         max_results=100,
-        # since={hashtag.newest_tweet.id},
+        # since_id=since,
     ).flatten(limit=MAX_TWEETS)
 
     return process_api_tweets(response)
@@ -154,7 +163,6 @@ def get_tweets_by_hashtag(hashtag, MAX_TWEETS=1000):
 
 def get_or_update_tweets_for_company(company, number_of_search_hashtags=5):
     hashtags = company.get_search_hashtags(number_of_search_hashtags)
-
     tweets_df = get_tweets_by_hashtag(company.search_name)
 
     if not tweets_df.empty:

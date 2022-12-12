@@ -126,10 +126,10 @@ class Company(FavoritesModelMixin):
     def get_sentiment_label(self, from_date_time=None, till_date_time=None):
         compound = self.get_compound(from_date_time, till_date_time)
         if compound > settings.SENTIMENT_COMPOUND_TRHESHOLD:
-            return 'positive'
+            return 'Positive'
         if compound < settings.SENTIMENT_COMPOUND_TRHESHOLD * -1:
-            return 'negative'
-        return 'neutral'
+            return 'Negative'
+        return 'Neutral'
 
     def get_hashtags(self, from_date_time=None, till_date_time=None):
         tweets = self.get_tweets(from_date_time, till_date_time)
