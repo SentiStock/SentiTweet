@@ -150,17 +150,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static and Media files
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-ASSETS_ROOT = '/static/assets'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
-STATIC_URL = '/static/'
-
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'sentitweet/static'),
-) 
 
 PLOTLY_COMPONENTS = [
     'dash_core_components',
@@ -215,6 +204,18 @@ DAYS_TILL_TWEETS_ARE_OUTDATED = 7
 
 pd.options.plotting.backend = "plotly"
 
+
+# Static and Media files
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
+STATIC_URL = '/static/'
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'sentitweet/static'),
+)
+
 # Azure Storage
 # https://django-storages.readthedocs.io/en/latest/backends/azure.html
 if os.environ.get('USE_AZURE_STATIC') == 'True':
@@ -225,3 +226,6 @@ if os.environ.get('USE_AZURE_STATIC') == 'True':
 
     DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
     STATICFILES_STORAGE = 'sentitweet.storage_backends.PublicAzureStorage'
+    STATIC_URL = f'https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/{AZURE_CONTAINER}/static/'
+
+ASSETS_ROOT = f'{STATIC_URL}assets'
