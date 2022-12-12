@@ -18,7 +18,7 @@ WORKDIR /app/
 # Install any needed packages specified in requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-EXPOSE 80 8888
+EXPOSE 80
 
 # Add our python cronjobs to machine cronjobs
 # Start cron
