@@ -26,5 +26,6 @@ django-redis==5.2.0
 channels-redis==4.0.0
 dash-renderer==1.9.1
 dash-bootstrap-components==1.2.1
-
-#jupyterlab==3.5.1
+django-storages==1.13.1
+azure-core==1.26.1
+azure-storage-blob==12.14.1
