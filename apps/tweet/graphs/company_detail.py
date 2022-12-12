@@ -768,11 +768,33 @@ def update_cluster_table(min_likes, company_id, from_date_chooser, till_date_cho
     cluster_elements = []
     for index, cluster in enumerate(clusters):
         p_text = ''.join(f'{word}' if index==0 else f' - {word}' for index, word in enumerate(cluster[0]))
+        extra_info = cluster[2]
 
         cluster_elements.append([
-            html.H4('Top used words in this potential event'),
-            html.Hr(),
-            html.P(p_text),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            html.H4('Top used words in this potential event'),
+                            html.Hr(),
+                            html.P(p_text),
+                        ], width=6
+                    ),
+                    dbc.Col(
+                        [
+                            html.H4('Extra info'),
+                            html.Hr(),
+                            html.P(
+                                f"Number of tweets: {extra_info['count']} - "
+                                f"Total likes: {extra_info['like_number']} - "
+                                f"Total retweets: {extra_info['retweet_number']} - "
+                                f"Total comments: {extra_info['comment_number']} - "
+                                f"Avarage sentiment: {extra_info['sentiment_compound']}"
+                            ),
+                        ], width=6
+                    )
+                ]
+            ),
             html.H4('Most representative tweets for this potential event'),
         ])
 
