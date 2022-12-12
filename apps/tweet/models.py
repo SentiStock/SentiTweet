@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core import serializers
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Avg, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
 from django.utils import timezone
 
 from home.models import PandasModelMixin
@@ -45,17 +45,17 @@ class TwitterUser(PandasModelMixin):
     def is_up_to_date(self):
         return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(settings.DAYS_TILL_TWEETS_ARE_OUTDATED)) if self.newest_tweet else False
 
-    @property
-    def total_likes(self):
-        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+    def total_likes(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('like_number'))['like_number__sum']
 
-    @property
-    def total_retweets(self):
-        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+    def total_retweets(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
 
-    @property
-    def total_comments(self):
-        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+    def total_comments(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('comment_number'))['comment_number__sum']
 
     def get_tweets(self, from_date_time=None, till_date_time=None):
         if not from_date_time:
@@ -170,21 +170,33 @@ class HashTag(FavoritesModelMixin):
             id__in=list(self.tweets.values_list('user_id', flat=True).distinct())
         )
 
-    @property
-    def top_twitter_users(self, top=10):
-        return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+    def total_likes(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('like_number'))['like_number__sum']
 
-    @property
-    def total_likes(self):
-        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+    def total_retweets(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
 
-    @property
-    def total_retweets(self):
-        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+    def total_comments(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('comment_number'))['comment_number__sum']
 
-    @property
-    def total_comments(self):
-        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+    def get_tweets(self, from_date_time=None, till_date_time=None):
+        if not from_date_time:
+            from_date_time = self.oldest_tweet.post_date if self.oldest_tweet else timezone.now()
+        if not till_date_time:
+            till_date_time = self.newest_tweet.post_date if self.newest_tweet else timezone.now()
+        return self.tweets.filter(
+            Q(post_date__gte=from_date_time) & Q(post_date__lte=till_date_time)
+        )
+
+    def get_compound(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        compound = tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg']
+        if compound:
+            return round(compound, 2)
+        return 0
 
     def __str__(self):
         return self.value
@@ -213,6 +225,18 @@ class Set(FavoritesModelMixin):
         return Tweet.objects.filter(id__in=tweet_ids)
 
     @property
+    def total_likes(self):
+        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+
+    @property
+    def total_retweets(self):
+        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+
+    @property
+    def total_comments(self):
+        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+
+    @property
     def newest_tweet(self):
         return self.tweets.order_by('-post_date').first()
 
@@ -233,17 +257,33 @@ class Set(FavoritesModelMixin):
     def top_twitter_users(self, top=10):
         return self.twitter_users.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
 
-    @property
-    def total_likes(self):
-        return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
+    def total_likes(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('like_number'))['like_number__sum']
 
-    @property
-    def total_retweets(self):
-        return self.tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
+    def total_retweets(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('retweet_number'))['retweet_number__sum']
 
-    @property
-    def total_comments(self):
-        return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+    def total_comments(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        return tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+
+    def get_tweets(self, from_date_time=None, till_date_time=None):
+        if not from_date_time:
+            from_date_time = self.oldest_tweet.post_date if self.oldest_tweet else timezone.now()
+        if not till_date_time:
+            till_date_time = self.newest_tweet.post_date if self.newest_tweet else timezone.now()
+        return self.tweets.filter(
+            Q(post_date__gte=from_date_time) & Q(post_date__lte=till_date_time)
+        )
+
+    def get_compound(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        compound = tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg']
+        if compound:
+            return round(compound, 2)
+        return 0
 
     def __str__(self):
         return self.name

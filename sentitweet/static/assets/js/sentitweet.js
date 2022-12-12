@@ -70,6 +70,7 @@ async function fetch_objects(query, objects) {
       }
       return Promise.reject(response);
     }).then(function (data) {
+      console.log(data)
       return data.data
     }).catch(function (error) {
       console.warn('Something went wrong.', error);

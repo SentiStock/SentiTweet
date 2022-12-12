@@ -179,6 +179,15 @@ def get_top_keywords(data, clusters, labels, n_terms):
 
     return key_words
 
+def get_cluster_info(tweets):
+    grouped_df = tweets.groupby([tweets['cluster']])
+    final_df = pd.DataFrame()
+    final_df['count'] = grouped_df['id'].count()
+    final_df['like_number'] = grouped_df['like_number'].sum()
+    final_df['retweet_number'] = grouped_df['retweet_number'].sum()
+    final_df['comment_number'] = grouped_df['comment_number'].sum()
+    final_df['sentiment_compound'] = grouped_df['sentiment_compound'].mean()
+    return final_df
 
 def cluster_tweets(tweets, max_k=10, number_of_best_tweets=3):
     if not isinstance(tweets, pd.DataFrame):
@@ -203,5 +212,6 @@ def cluster_tweets(tweets, max_k=10, number_of_best_tweets=3):
 
     best_tweets = get_most_repr_tweets(model, tweets, text, number_of_best_tweets)
     top_words = get_top_keywords(text, clusters, tfidf.get_feature_names(), 10)
+    info = get_cluster_info(tweets)
 
-    return best_tweets, top_words
+    return best_tweets, top_words, info

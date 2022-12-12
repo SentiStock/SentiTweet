@@ -12,10 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 import sys
 from pathlib import Path
-import pandas as pd
-
 
 import nltk
+import pandas as pd
 from dotenv import load_dotenv
 
 nltk.download('stopwords') #FIXME to deltete
