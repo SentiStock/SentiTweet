@@ -8,7 +8,7 @@ from django.db.models import Avg, Count, Q, Sum
 from django_plotly_dash import DjangoDash
 from stock.models import Company
 from stock.utils import get_cluster_context
-from tweet.models import Tweet, TwitterUser
+from tweet.models import HashTag, Tweet, TwitterUser
 
 df = Tweet.as_dataframe(Tweet.objects.filter(id=1598620724163248129))
 
@@ -93,12 +93,17 @@ app.layout = html.Div([
                 ), width=12),
                 dbc.Col(dbc.Card(
                     [
+                        dbc.CardBody(id='tweets_table'),
+                    ],
+                ), md=12, lg=12),
+                dbc.Col(dbc.Card(
+                    [
                         dbc.CardBody(id='users_table'),
                     ],
                 ), md=12, lg=6),
                 dbc.Col(dbc.Card(
                     [
-                        dbc.CardBody(id='tweets_table'),
+                        dbc.CardBody(id='hashtags_table'),
                     ],
                 ), md=12, lg=6),
             ]
@@ -296,18 +301,16 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
     df = TwitterUser.as_dataframe(users)
     df['compound'] = [i.get_compound(from_date_chooser, till_date_chooser) for i in users]
     df['total_likes'] = [i.total_likes(from_date_chooser, till_date_chooser) for i in users]
-    df['tweets_count'] = [i.tweets.count() for i in users]
+    df['tweets_count'] = [i.get_tweets(from_date_chooser, till_date_chooser).count() for i in users]
 
     active_tabs = []
     df_tweets = df.sort_values(by='tweets_count', ascending=False)
     df_tweets = df_tweets.reset_index(drop=True)
     for i in range(number_of_users):
-        user = df.loc[i,:]
+        user = df_tweets.loc[i,:]
         active_tabs.append(
             html.Tr([
-                html.Td(
-                    html.P(user.username)
-                ),
+                html.Td(html.P(user.username, className='m-0 text-c-green')),
                 html.Td(html.H6(user.tweets_count, className='m-0')),
                 html.Td(html.H6(user.total_likes, className='m-0')),
                 html.Td(html.H6(user.compound, className='m-0')),
@@ -336,7 +339,7 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
         like_tabs.append(
             html.Tr([
                 html.Td(
-                    html.P(user.username)
+                    html.P(user.username, className='m-0 text-c-green')
                 ),
                 html.Td(html.H6(user.tweets_count, className='m-0')),
                 html.Td(html.H6(user.total_likes, className='m-0')),
@@ -366,7 +369,7 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
         positive_tabs.append(
             html.Tr([
                 html.Td(
-                    html.P(user.username)
+                    html.P(user.username, className='m-0 text-c-green')
                 ),
                 html.Td(html.H6(user.tweets_count, className='m-0')),
                 html.Td(html.H6(user.total_likes, className='m-0')),
@@ -396,7 +399,7 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
         negative_tabs.append(
             html.Tr([
                 html.Td(
-                    html.P(user.username)
+                    html.P(user.username, className='m-0 text-c-green')
                 ),
                 html.Td(html.H6(user.tweets_count, className='m-0')),
                 html.Td(html.H6(user.total_likes, className='m-0')),
@@ -429,151 +432,322 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
         ]
     )]
 
-# @app.callback(
-#     Output('tweets_table', 'children'), [
-#         Input('like_slider', 'value'),
-#         Input('company_id', 'value'),
-#         Input('from_date_chooser', 'value'),
-#         Input('till_date_chooser', 'value'),
-#     ])
-# def update_tweets_table(min_likes, company_id, from_date_chooser, till_date_chooser):
-#     company = Company.objects.get(id=company_id)
-#     tweets = company.get_tweets(from_date_chooser, till_date_chooser)
-#     number_of_tweets = len(tweets) if len(tweets) < 5 else 5
+@app.callback(
+    Output('hashtags_table', 'children'), [
+        Input('like_slider', 'value'),
+        Input('company_id', 'value'),
+        Input('from_date_chooser', 'value'),
+        Input('till_date_chooser', 'value'),
+    ])
+def update_hashtags_table(min_likes, company_id, from_date_chooser, till_date_chooser):
+    company = Company.objects.get(id=company_id)
+    hashtags = company.get_hashtags(from_date_chooser, till_date_chooser)
+    number_of_hashtags = len(hashtags) if len(hashtags) < 5 else 5
 
-#     df = Tweets.as_dataframe(tweets)
-#     df['compound'] = [i.get_compound(from_date_chooser, till_date_chooser) for i in users]
-#     df['total_likes'] = [i.total_likes(from_date_chooser, till_date_chooser) for i in users]
-#     df['tweets_count'] = [i.tweets.count() for i in users]
+    df = HashTag.as_dataframe(hashtags)
+    df['compound'] = [i.get_compound(from_date_chooser, till_date_chooser) for i in hashtags]
+    df['total_likes'] = [i.total_likes(from_date_chooser, till_date_chooser) for i in hashtags]
+    df['tweets_count'] = [i.get_tweets(from_date_chooser, till_date_chooser).count() for i in hashtags]
 
-#     active_tabs = []
-#     df_tweets = df.sort_values(by='tweets_count', ascending=False)
-#     df_tweets = df_tweets.reset_index(drop=True)
-#     for i in range(number_of_users):
-#         user = df.loc[i,:]
-#         active_tabs.append(
-#             html.Tr([
-#                 html.Td(
-#                     html.P(user.username)
-#                 ),
-#                 html.Td(html.H6(user.tweets_count, className='m-0')),
-#                 html.Td(html.H6(user.total_likes, className='m-0')),
-#                 html.Td(html.H6(user.compound, className='m-0')),
-#             ])
-#         )
+    active_tabs = []
+    df_tweets = df.sort_values(by='tweets_count', ascending=False)
+    df_tweets = df_tweets.reset_index(drop=True)
+    for i in range(number_of_hashtags):
+        hashtag = df_tweets.loc[i,:]
+        active_tabs.append(
+            html.Tr([
+                html.Td(html.P(hashtag.value, className='m-0 text-c-green')),
+                html.Td(html.H6(hashtag.tweets_count, className='m-0')),
+                html.Td(html.H6(hashtag.total_likes, className='m-0')),
+                html.Td(html.H6(hashtag.compound, className='m-0')),
+            ])
+        )
     
-#     active = html.Div(dbc.Table(
-#         [
-#             html.Tr([
-#                 html.Th('User'),
-#                 html.Th('Tweets'),
-#                 html.Th('Likes'),
-#                 html.Th('Sentiment'),
-#             ]),
-#             html.Tbody(
-#                 active_tabs
-#             ), 
-#         ], bordered=True, hover=True, responsive=True,
-#     ))
+    active = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Hashtag'),
+                html.Th('Tweets'),
+                html.Th('Likes'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                active_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
 
-#     like_tabs = []
-#     df_likes = df.sort_values(by='total_likes', ascending=False)
-#     df_likes = df_likes.reset_index(drop=True)
-#     for i in range(number_of_users):
-#         user = df_likes.loc[i,:]
-#         like_tabs.append(
-#             html.Tr([
-#                 html.Td(
-#                     html.P(user.username)
-#                 ),
-#                 html.Td(html.H6(user.tweets_count, className='m-0')),
-#                 html.Td(html.H6(user.total_likes, className='m-0')),
-#                 html.Td(html.H6(user.compound, className='m-0')),
-#             ])
-#         )
+    like_tabs = []
+    df_likes = df.sort_values(by='total_likes', ascending=False)
+    df_likes = df_likes.reset_index(drop=True)
+    for i in range(number_of_hashtags):
+        hashtag = df_likes.loc[i,:]
+        like_tabs.append(
+            html.Tr([
+                html.Td(html.P(hashtag.value, className='m-0 text-c-green')),
+                html.Td(html.H6(hashtag.tweets_count, className='m-0')),
+                html.Td(html.H6(hashtag.total_likes, className='m-0')),
+                html.Td(html.H6(hashtag.compound, className='m-0')),
+            ])
+        )
     
-#     like = html.Div(dbc.Table(
-#         [
-#             html.Tr([
-#                 html.Th('User'),
-#                 html.Th('Tweets'),
-#                 html.Th('Likes'),
-#                 html.Th('Sentiment'),
-#             ]),
-#             html.Tbody(
-#                 like_tabs
-#             ), 
-#         ], bordered=True, hover=True, responsive=True,
-#     ))
+    like = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Hashtag'),
+                html.Th('Tweets'),
+                html.Th('Likes'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                like_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
     
-#     positive_tabs = []
-#     df_positive = df.sort_values(by='compound', ascending=False)
-#     df_positive = df_positive.reset_index(drop=True)
-#     for i in range(number_of_users):
-#         user = df_positive.loc[i,:]
-#         positive_tabs.append(
-#             html.Tr([
-#                 html.Td(
-#                     html.P(user.username)
-#                 ),
-#                 html.Td(html.H6(user.tweets_count, className='m-0')),
-#                 html.Td(html.H6(user.total_likes, className='m-0')),
-#                 html.Td(html.H6(user.compound, className='m-0')),
-#             ])
-#         )
+    positive_tabs = []
+    df_positive = df.sort_values(by='compound', ascending=False)
+    df_positive = df_positive.reset_index(drop=True)
+    for i in range(number_of_hashtags):
+        hashtag = df_positive.loc[i,:]
+        positive_tabs.append(
+            html.Tr([
+                html.Td(html.P(hashtag.value, className='m-0 text-c-green')),
+                html.Td(html.H6(hashtag.tweets_count, className='m-0')),
+                html.Td(html.H6(hashtag.total_likes, className='m-0')),
+                html.Td(html.H6(hashtag.compound, className='m-0')),
+            ])
+        )
     
-#     positive = html.Div(dbc.Table(
-#         [
-#             html.Tr([
-#                 html.Th('User'),
-#                 html.Th('Tweets'),
-#                 html.Th('Likes'),
-#                 html.Th('Sentiment'),
-#             ]),
-#             html.Tbody(
-#                 positive_tabs
-#             ), 
-#         ], bordered=True, hover=True, responsive=True,
-#     ))
+    positive = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Hashtag'),
+                html.Th('Tweets'),
+                html.Th('Likes'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                positive_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
 
-#     negative_tabs = []
-#     df_negative = df.sort_values(by='compound', ascending=True)
-#     df_negative = df_negative.reset_index(drop=True)
-#     for i in range(number_of_users):
-#         user = df_negative.loc[i,:]
-#         negative_tabs.append(
-#             html.Tr([
-#                 html.Td(
-#                     html.P(user.username)
-#                 ),
-#                 html.Td(html.H6(user.tweets_count, className='m-0')),
-#                 html.Td(html.H6(user.total_likes, className='m-0')),
-#                 html.Td(html.H6(user.compound, className='m-0')),
-#             ])
-#         )
+    negative_tabs = []
+    df_negative = df.sort_values(by='compound', ascending=True)
+    df_negative = df_negative.reset_index(drop=True)
+    for i in range(number_of_hashtags):
+        hashtag = df_negative.loc[i,:]
+        negative_tabs.append(
+            html.Tr([
+                html.Td(html.P(hashtag.value, className='m-0 text-c-green')),
+                html.Td(html.H6(hashtag.tweets_count, className='m-0')),
+                html.Td(html.H6(hashtag.total_likes, className='m-0')),
+                html.Td(html.H6(hashtag.compound, className='m-0')),
+            ])
+        )
     
-#     negative = html.Div(dbc.Table(
-#         [
-#             html.Tr([
-#                 html.Th('User'),
-#                 html.Th('Tweets'),
-#                 html.Th('Likes'),
-#                 html.Th('Sentiment'),
-#             ]),
-#             html.Tbody(
-#                 negative_tabs
-#             ), 
-#         ], bordered=True, hover=True, responsive=True,
-#     ))
+    negative = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Hashtag'),
+                html.Th('Tweets'),
+                html.Th('Likes'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                negative_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
 
-#     return dbc.Tabs(
-#         [
-#             dbc.Tab(active, label='Tweets'),
-#             dbc.Tab(like, label='Likes'),
-#             dbc.Tab(positive, label='Positive'),
-#             dbc.Tab(negative, label='Negative'),
-#         ]
-#     )
+    return [
+        html.H3('Most Interesting Hashtags'),
+        dbc.Tabs(
+        [
+            dbc.Tab(active, label='Tweets'),
+            dbc.Tab(like, label='Likes'),
+            dbc.Tab(positive, label='Positive'),
+            dbc.Tab(negative, label='Negative'),
+        ]
+    )]
+
+@app.callback(
+    Output('tweets_table', 'children'), [
+        Input('like_slider', 'value'),
+        Input('company_id', 'value'),
+        Input('from_date_chooser', 'value'),
+        Input('till_date_chooser', 'value'),
+    ])
+def update_tweets_table(min_likes, company_id, from_date_chooser, till_date_chooser):
+    company = Company.objects.get(id=company_id)
+    tweets = company.get_tweets(from_date_chooser, till_date_chooser).filter(like_number__gte=min_likes)
+    number_of_tweets = len(tweets) if len(tweets) < 5 else 5
+
+    df = Tweet.as_dataframe(tweets)
+    df['compound'] = df['sentiment_compound']
+    like_tabs = []
+    df_likes = df.sort_values(by='like_number', ascending=False)
+    df_likes = df_likes.reset_index(drop=True)
+    for i in range(number_of_tweets):
+        tweet = df_likes.loc[i,:]
+        like_tabs.append(
+            html.Tr([
+                html.Td(html.P(tweet.text, className='m-0 text-c-green')),
+                html.Td(html.H6(tweet.like_number, className='m-0')),
+                html.Td(html.H6(tweet.retweet_number, className='m-0')),
+                html.Td(html.H6(tweet.comment_number, className='m-0')),
+                html.Td(html.H6(tweet.compound, className='m-0')),
+            ])
+        )
+    
+    like = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Text'),
+                html.Th('Likes'),
+                html.Th('Retweets'),
+                html.Th('Comments'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                like_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
+
+    retweet_tabs = []
+    df_retweets = df.sort_values(by='retweet_number', ascending=False)
+    df_retweets = df_retweets.reset_index(drop=True)
+    for i in range(number_of_tweets):
+        tweet = df_retweets.loc[i,:]
+        retweet_tabs.append(
+            html.Tr([
+                html.Td(html.P(tweet.text, className='m-0 text-c-green')),
+                html.Td(html.H6(tweet.like_number, className='m-0')),
+                html.Td(html.H6(tweet.retweet_number, className='m-0')),
+                html.Td(html.H6(tweet.comment_number, className='m-0')),
+                html.Td(html.H6(tweet.compound, className='m-0')),
+            ])
+        )
+    
+    retweet = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Text'),
+                html.Th('Likes'),
+                html.Th('Retweets'),
+                html.Th('Comments'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                retweet_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
+
+    comment_tabs = []
+    df_comments = df.sort_values(by='comment_number', ascending=False)
+    df_comments = df_comments.reset_index(drop=True)
+    for i in range(number_of_tweets):
+        tweet = df_comments.loc[i,:]
+        comment_tabs.append(
+            html.Tr([
+                html.Td(html.P(tweet.text, className='m-0 text-c-green')),
+                html.Td(html.H6(tweet.like_number, className='m-0')),
+                html.Td(html.H6(tweet.retweet_number, className='m-0')),
+                html.Td(html.H6(tweet.comment_number, className='m-0')),
+                html.Td(html.H6(tweet.compound, className='m-0')),
+            ])
+        )
+    
+    comment = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Text'),
+                html.Th('Likes'),
+                html.Th('Retweets'),
+                html.Th('Comments'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                comment_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
+    
+    positive_tabs = []
+    df_positive = df.sort_values(by='compound', ascending=False)
+    df_positive = df_positive.reset_index(drop=True)
+    for i in range(number_of_tweets):
+        tweet = df_positive.loc[i,:]
+        positive_tabs.append(
+            html.Tr([
+                html.Td(html.P(tweet.text, className='m-0 text-c-green')),
+                html.Td(html.H6(tweet.like_number, className='m-0')),
+                html.Td(html.H6(tweet.retweet_number, className='m-0')),
+                html.Td(html.H6(tweet.comment_number, className='m-0')),
+                html.Td(html.H6(tweet.compound, className='m-0')),
+            ])
+        )
+    
+    positive = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Text'),
+                html.Th('Likes'),
+                html.Th('Retweets'),
+                html.Th('Comments'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                positive_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
+
+    negative_tabs = []
+    df_negative = df.sort_values(by='compound', ascending=True)
+    df_negative = df_negative.reset_index(drop=True)
+    for i in range(number_of_tweets):
+        tweet = df_negative.loc[i,:]
+        negative_tabs.append(
+            html.Tr([
+                html.Td(html.P(tweet.text, className='m-0 text-c-green')),
+                html.Td(html.H6(tweet.like_number, className='m-0')),
+                html.Td(html.H6(tweet.retweet_number, className='m-0')),
+                html.Td(html.H6(tweet.comment_number, className='m-0')),
+                html.Td(html.H6(tweet.compound, className='m-0')),
+            ])
+        )
+    
+    negative = html.Div(dbc.Table(
+        [
+            html.Tr([
+                html.Th('Text'),
+                html.Th('Likes'),
+                html.Th('Retweets'),
+                html.Th('Comments'),
+                html.Th('Sentiment'),
+            ]),
+            html.Tbody(
+                negative_tabs
+            ), 
+        ], bordered=True, hover=True, responsive=True,
+    ))
+
+    return [
+            html.H3('Most Interesting Tweets'),
+            dbc.Tabs(
+            [
+                dbc.Tab(like, label='Likes'),
+                dbc.Tab(retweet, label='Retweets'),
+                dbc.Tab(comment, label='Comments'),
+                dbc.Tab(positive, label='Positive'),
+                dbc.Tab(negative, label='Negative'),
+            ]
+        )
+    ]
 
 @app.callback(
     Output('cluster_table', 'children'), [
@@ -604,7 +778,7 @@ def update_cluster_table(min_likes, company_id, from_date_chooser, till_date_cho
 
         for best_tweet in cluster[1]:
             cluster_elements[index].append(html.Hr())
-            cluster_elements[index].append(html.P(best_tweet))#, className='m-0 text-c-green'))
+            cluster_elements[index].append(html.P(best_tweet, className='m-0 text-c-green'))
 
     tabs = dbc.Tabs([])
     for index, cluster in enumerate(clusters):

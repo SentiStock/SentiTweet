@@ -56,7 +56,7 @@ class Company(FavoritesModelMixin):
     @property
     def favorite_count(self):
         return self.favorites.count()
-        
+
     @property
     def newest_tweet(self):
         return self.tweets.order_by('-post_date').first()
@@ -121,7 +121,11 @@ class Company(FavoritesModelMixin):
         return self.hashtags.filter(id__in=hashtag_ids)
 
     def get_twitter_users(self, from_date_time=None, till_date_time=None):
-        from tweet.models import TwitterUser
         tweets = self.get_tweets(from_date_time, till_date_time)
         user_ids = set(tweets.values_list('user', flat=True).distinct())
-        return TwitterUser.objects.filter(id__in=user_ids)
+        return tweet_models.TwitterUser.objects.filter(id__in=user_ids)
+
+    def get_hashtags(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        hashtag_ids = set(tweets.values_list('hashtags', flat=True).distinct())
+        return tweet_models.HashTag.objects.filter(id__in=hashtag_ids)
