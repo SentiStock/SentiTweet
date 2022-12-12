@@ -214,3 +214,14 @@ SENTIMENT_COMPOUND_TRHESHOLD = 0.2
 DAYS_TILL_TWEETS_ARE_OUTDATED = 7
 
 pd.options.plotting.backend = "plotly"
+
+# Azure Storage
+# https://django-storages.readthedocs.io/en/latest/backends/azure.html
+if os.environ.get('USE_AZURE_STATIC') == 'True':
+    AZURE_ACCOUNT_NAME=os.environ.get('AZURE_ACCOUNT_NAME')
+    AZURE_ACCOUNT_KEY=os.environ.get('AZURE_ACCOUNT_KEY')
+    AZURE_CONTAINER=os.environ.get('AZURE_CONTAINER')
+    AZURE_SSL=True
+
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    STATICFILES_STORAGE = 'sentitweet.storage_backends.PublicAzureStorage'
