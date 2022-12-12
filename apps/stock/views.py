@@ -45,7 +45,7 @@ def company_detail(request, company_symbol_or_name):
     context['is_favorite'] = request.user.is_favorite(company)
     context['tweets'] = tweets
     context['dash_context'] =  {'company_id': {'value': company.id}}
-    context['clusters'] = get_cluster_context(tweets)
+    context['clusters'] = list(get_cluster_context(tweets))
 
     return render(request, 'stock/company_page.html', context)
 

@@ -42,6 +42,22 @@ class Company(FavoritesModelMixin):
         return self.name.split(' ')[0].split('.')[0]
 
     @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def hashtag_count(self):
+        return self.hashtags.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
+        
+    @property
     def newest_tweet(self):
         return self.tweets.order_by('-post_date').first()
 

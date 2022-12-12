@@ -1,6 +1,6 @@
 from django.db.models import Count, Q
 from stock.models import Company
-from tweet.models import HashTag, Set, TwitterUser, Contributor
+from tweet.models import Contributor, HashTag, Set, TwitterUser
 from tweet.utils import cluster_tweets
 
 
@@ -43,6 +43,6 @@ def get_cluster_context(tweets):
     if len(tweets) > 50:
         best_tweets, top_words = cluster_tweets(tweets, number_of_best_tweets=5)
         # TODO make best_tweets to be all attributes
-        return list(zip(top_words.values(), best_tweets.groupby('cluster').text.apply(list)))
+        return zip(top_words.values(), best_tweets.groupby('cluster').text.apply(list))
     return None
 
