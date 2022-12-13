@@ -1,3 +1,5 @@
+import datetime
+
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -5,6 +7,7 @@ import plotly.express as px
 from dash import Input, Output, dcc, html
 from django.conf import settings
 from django.db.models import Avg, Count, Q, Sum
+from django.utils import timezone
 from django_plotly_dash import DjangoDash
 from stock.models import Company
 from stock.utils import get_cluster_context
@@ -33,8 +36,21 @@ app.layout = html.Div([
     html.Div([
         dbc.Row(
             [
-                dbc.Col([], md=6, lg=4, id='main_info'),
-                dbc.Col([], md=6, lg=4, id='numbers'),
+                dbc.Col(dbc.Card(dbc.CardBody([])), md=6, lg=4, id='main_info'),
+                dbc.Col([
+                    dbc.Card(dbc.CardBody([
+                        html.H3('Numbers'),
+                        html.H6('Tweets: 0'),
+                        html.H6('Hashtags: 0'),
+                        html.H6('Twitter Users: 0'),
+                        html.H6('Followers: 0'),
+                    ])),
+                        dbc.Card(dbc.CardBody([
+                            html.H6('Total Likes: 0'),
+                            html.H6('Total Retweets: 0'),
+                            html.H6('Total Comments: 0'),
+                    ])),
+                ], md=6, lg=4, id='numbers'),
                 dbc.Col(dbc.Card(
                     [
                         dbc.CardBody(
@@ -49,19 +65,19 @@ app.layout = html.Div([
                                     html.H6('Number of likes'),
                                     html.Div(id='likes_slider'),
                                 ], className='mt-4'),
-                                html.Div([
-                                    html.H6('Graph detail'),
-                                    html.Div(dcc.Dropdown(
-                                        id='graph_detail_chooser',
-                                        options=[
-                                            {'label': 'Daily', 'value': 'day'},
-                                            {'label': 'Hourly', 'value': 'hour'},
-                                            {'label': 'Munites', 'value': 'minute'},
-                                            {'label': 'Seconds', 'value': 'second'},
-                                        ],
-                                        value='day',
-                                    ), id='graph_detail_chooser_div'),
-                                ], className='mt-4'),
+                                # html.Div([
+                                #     html.H6('Graph detail'),
+                                #     html.Div(dcc.Dropdown(
+                                #         id='graph_detail_chooser',
+                                #         options=[
+                                #             {'label': 'Daily', 'value': 'day'},
+                                #             {'label': 'Hourly', 'value': 'hour'},
+                                #             {'label': 'Munites', 'value': 'minute'},
+                                #             {'label': 'Seconds', 'value': 'second'},
+                                #         ],
+                                #         value='day',
+                                #     ), id='graph_detail_chooser_div'),
+                                # ], className='mt-4'),
                             ]
                         ),
                     ],
@@ -125,11 +141,13 @@ def update_main_info(company_id, min_likes, from_date_chooser, till_date_chooser
     df = df[df.like_number >= min_likes]
     return dbc.Card(dbc.CardBody([
         html.H2(company.name),
-        html.H4(company.symbol),
-        html.H6(f'{company.country}'),
-        html.H6(f'Stock price: {company.stock_price}$'),
-        html.H6(f'{df.post_date.dt.date.min()} - {df.post_date.dt.date.max()}'),
-        html.H6(f'Sentiment: {company.get_compound(from_date_chooser, till_date_chooser)} --> {company.get_sentiment_label(from_date_chooser, till_date_chooser)}'),
+        html.Hr(),
+        # html.I(className='feather icon-twitter'),
+        html.H4(f'Stock symbol: {company.symbol}'),
+        html.H6(f'Country: {company.country}'),
+        html.H6(f'Tweets filter: {df.post_date.dt.date.min()} - {df.post_date.dt.date.max()}'),
+        html.H6(f'Sentiment: {company.get_sentiment_label(from_date_chooser, till_date_chooser)}'),
+        html.H6(f'Compound: {company.get_compound(from_date_chooser, till_date_chooser)}'),
     ]))
 
 @app.callback(
@@ -185,7 +203,7 @@ def update_from_date_chooser(company_id):
     return dcc.Dropdown(
         id='from_date_chooser',
         options=[{'label': i, 'value': i} for i in df.post_date.dt.date.sort_values().unique()],
-        # value=df.post_date.dt.date.min(), # TODO default till 1 week ago??
+        value=(timezone.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'), # TODO default till 1 week ago??
         placeholder='Date From',
     )
 
@@ -233,14 +251,13 @@ def update_figure(min_likes, company_id, from_date_chooser, till_date_chooser):
         Input('company_id', 'value'),
         Input('from_date_chooser', 'value'),
         Input('till_date_chooser', 'value'),
-        Input('graph_detail_chooser', 'value'),
     ])
-def update_figure(min_likes, company_id, from_date_chooser, till_date_chooser, graph_detail_chooser):
+def update_figure(min_likes, company_id, from_date_chooser, till_date_chooser):
     company = Company.objects.get(id=company_id)
     df = get_tweets(company, from_date_time=from_date_chooser, till_date_time=till_date_chooser)
     df = df[df.like_number >= min_likes]
     # df['sentiment_compound_normalized'] = df.apply(lambda x: x.sentiment_compound*x.like_number if x.sentiment_compound else 0, axis=1)
-    grouped_df = group_by_date(df, graph_detail_chooser)
+    grouped_df = df.groupby([df['post_date'].dt.date], sort=True)
     display_df = grouped_df.count()
     display_df['sentiment_compound'] = grouped_df['sentiment_compound'].mean()
     # display_df['sentiment_compound_normalized'] = grouped_df['sentiment_compound_normalized'].mean()
@@ -299,6 +316,7 @@ def update_users_table(min_likes, company_id, from_date_chooser, till_date_choos
     number_of_users = len(users) if len(users) < 5 else 5
 
     df = TwitterUser.as_dataframe(users)
+
     df['compound'] = [i.get_compound(from_date_chooser, till_date_chooser) for i in users]
     df['total_likes'] = [i.total_likes(from_date_chooser, till_date_chooser) for i in users]
     df['tweets_count'] = [i.get_tweets(from_date_chooser, till_date_chooser).count() for i in users]

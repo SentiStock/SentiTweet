@@ -175,8 +175,8 @@ STATICFILES_FINDERS = [
 # CRONJOBS
 CRONJOBS = [
     # Everyday 15 minutes we fetch new tweets from twitter for every company
-    #('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
-    #('*/15 * * * *', 'sentitweet.cron.tweet_score_sentiment'),
+    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+    ('*/15 * * * *', 'sentitweet.cron.tweet_score_sentiment'),
 ]
 
 #Dash Plotly
@@ -202,6 +202,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 ASGI_APPLICATION = 'sentitweet.routing.application'
 
 SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY=os.environ['SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY']
+SENTITWEETAPI_SENTIMENT_URL=os.environ['SENTITWEETAPI_SENTIMENT_URL']
 
 SENTIMENT_COMPOUND_TRHESHOLD = 0.2
 DAYS_TILL_TWEETS_ARE_OUTDATED = 7

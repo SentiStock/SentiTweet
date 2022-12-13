@@ -17,27 +17,30 @@ from sklearn.metrics import silhouette_score
 from tweet.models import HashTag, Tweet
 
 
-def get_sentiment(tweets):
+def get_sentiment(all_tweets):
     headers = {
         "Content-Type": "application/json; charset=utf-8", 
         "x-functions-key": settings.SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY
     }
+    print(len(all_tweets))
+    for i in range(0, len(all_tweets), 600):
+        tweets = all_tweets[i:i+600]
     
-    data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
-    
-    response = requests.post(settings.SENTITWEETAPI_SENTIMENT_URL, headers=headers, json=data)
-    print(response)
-    for scored_tweet in json.loads(response._content):
-        try:
-            tweet_to_score = tweets.get(id=scored_tweet[0])
-            tweet_to_score.sentiment_positive = scored_tweet[1]['positive']
-            tweet_to_score.sentiment_negative = scored_tweet[1]['negative']
-            tweet_to_score.sentiment_neutral = scored_tweet[1]['neutral']
-            tweet_to_score.sentiment_compound = scored_tweet[1]['compound']
-            tweet_to_score.sentiment_uncertain = scored_tweet[1]['uncertain']
-            tweet_to_score.save()
-        except Exception as e:
-            continue
+        data = {"tweets": [{"id": tweet.id, "text": tweet.text} for tweet in tweets]}
+        
+        response = requests.post(settings.SENTITWEETAPI_SENTIMENT_URL, headers=headers, json=data)
+        print(response)
+        for scored_tweet in json.loads(response._content):
+            try:
+                tweet_to_score = all_tweets.get(id=scored_tweet[0])
+                tweet_to_score.sentiment_positive = scored_tweet[1]['positive']
+                tweet_to_score.sentiment_negative = scored_tweet[1]['negative']
+                tweet_to_score.sentiment_neutral = scored_tweet[1]['neutral']
+                tweet_to_score.sentiment_compound = scored_tweet[1]['compound']
+                tweet_to_score.sentiment_uncertain = scored_tweet[1]['uncertain']
+                tweet_to_score.save()
+            except Exception as e:
+                continue
     
     return tweets
         
