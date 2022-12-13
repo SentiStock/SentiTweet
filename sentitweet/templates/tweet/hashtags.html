@@ -22,24 +22,27 @@
                             <div class="row">
 
                                 <!-- [ Info ] start -->
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card">
+                                <div class="col-md-3 col-xl-3">
+                                    <div class="card align-items-center">
                                         <div class="card-block">
-                                            <h2>{{hashtags|length}} Hashtags</h2>
+                                            <span class="d-block text-uppercase">TOTAL HASHTAGS</span>
+                                            <div class="row d-flex align-items-center">
+                                                <div class="col-9">
+                                                    <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                        <i class="feather icon-hash text-c-red f-30 m-r-10"></i>
+                                                            {{hashtags|length}}
+                                                    </h3>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 col-xl-4">
+                                <div class="col-md-6 col-xl-8">
                                     <div class="card">
                                         <div class="card-block">
-                                            Some info
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-4">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h4>Something very interesting</h4>
+                                            <h4>You can filter the hashtags in the search pane.</h4>
+                                            <span>When you click on them you will go to the detailed hashtag page.</span>
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -49,18 +52,31 @@
                                 <div class="col-xl-12 col-md-6">
                                     <div class="card Recent-Users">
                                         <div class="card-header">
-                                            <input class="form-control" type="text" placeholder="Search All Hashtags..." id="searchTable">
+                                            <input class="form-control" type="text" placeholder="Search All Hashtags..." id="searchTableHashtags">
                                         </div>
                                         <div class="card-block px-0 py-3">
                                             <div class="table-responsive">
-                                                <table id="listAllTable" class="table table-hover">
+                                                <table id="listAllTableHashtags" class="table table-hover">
                                                     <tbody>
-                                                    {% for hashtag in hashtags|slice:':100' %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <th ></th>
+                                                                <th >Hashtag</th>
+                                                                <th>Total Tweets</th>
+                                                                <th>Contained in sets</th>
+                                                                <th>Last updated</th>
+                                                                <th>Total Followers</th>
+                                                            </tr>
+                                                        {% for hashtag in hashtags|slice:':100' %}
                                                         <tr class="unread">
                                                             <td>
                                                                 <a href="{{hashtag.clean_value}}/">
-                                                                    <h6 class="mb-1" style="white-space: initial;">{{hashtag.value}}</h6>
-                                                                    {% comment %} <p class="m-0">{{company.symbol}}</p> {% endcomment %}
+                                                                    <i class="feather icon-hash text-c-red f-30 m-r-10"></i>
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a href="{{hashtag.clean_value}}/">
+                                                                    <h6 class="mb-1">{{hashtag.value}}</h6>
                                                                 </a>
                                                             </td>
                                                             <td>

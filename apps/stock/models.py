@@ -1,8 +1,9 @@
 import datetime
 
 from authentication.models import FavoritesModelMixin
+from django.conf import settings
 from django.db import models
-from django.db.models import Count, Q, Sum
+from django.db.models import Avg, Count, Q, Sum
 from django.utils import timezone
 from tweet import models as tweet_models
 
@@ -35,10 +36,42 @@ class Company(FavoritesModelMixin):
 
     def get_top_hashtags(self, top=10):
         return self.hashtags.annotate(t_count=Count('tweets')).order_by('-t_count')[:top]
+    
+    @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def hashtag_count(self):
+        return self.hashtags.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
 
     @property
     def search_name(self):
         return self.name.split(' ')[0].split('.')[0]
+
+    @property
+    def tweet_count(self):
+        return self.tweets.count()
+
+    @property
+    def hashtag_count(self):
+        return self.hashtags.count()
+
+    @property
+    def twitter_user_count(self):
+        return self.twitter_users.count()
+
+    @property
+    def favorite_count(self):
+        return self.favorites.count()
 
     @property
     def newest_tweet(self):
@@ -50,7 +83,7 @@ class Company(FavoritesModelMixin):
 
     @property
     def is_up_to_date(self):
-        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(7)) if self.newest_tweet else False
+        return self.newest_tweet.post_date > (timezone.now() - datetime.timedelta(settings.DAYS_TILL_TWEETS_ARE_OUTDATED)) if self.newest_tweet else False
 
     @property
     def twitter_users(self):
@@ -64,7 +97,6 @@ class Company(FavoritesModelMixin):
 
     @property
     def total_likes(self):
-        print(self.tweets.aggregate(Sum('like_number')))
         return self.tweets.aggregate(Sum('like_number'))['like_number__sum']
 
     @property
@@ -74,3 +106,42 @@ class Company(FavoritesModelMixin):
     @property
     def total_comments(self):
         return self.tweets.aggregate(Sum('comment_number'))['comment_number__sum']
+
+    def get_tweets(self, from_date_time=None, till_date_time=None):
+        if not from_date_time:
+            from_date_time = self.oldest_tweet.post_date if self.oldest_tweet else timezone.now()
+        if not till_date_time:
+            till_date_time = self.newest_tweet.post_date if self.newest_tweet else timezone.now()
+        return self.tweets.filter(
+            Q(post_date__gte=from_date_time) & Q(post_date__lte=till_date_time)
+        )
+
+    def get_compound(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        compound = tweets.aggregate(Avg('sentiment_compound'))['sentiment_compound__avg']
+        if compound:
+            return round(compound, 2)
+        return 0
+
+    def get_sentiment_label(self, from_date_time=None, till_date_time=None):
+        compound = self.get_compound(from_date_time, till_date_time)
+        if compound > settings.SENTIMENT_COMPOUND_TRHESHOLD:
+            return 'Positive'
+        if compound < settings.SENTIMENT_COMPOUND_TRHESHOLD * -1:
+            return 'Negative'
+        return 'Neutral'
+
+    def get_hashtags(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        hashtag_ids = set(tweets.values_list('hashtags', flat=True).distinct())
+        return self.hashtags.filter(id__in=hashtag_ids)
+
+    def get_twitter_users(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        user_ids = set(tweets.values_list('user', flat=True).distinct())
+        return tweet_models.TwitterUser.objects.filter(id__in=user_ids)
+
+    def get_hashtags(self, from_date_time=None, till_date_time=None):
+        tweets = self.get_tweets(from_date_time, till_date_time)
+        hashtag_ids = set(tweets.values_list('hashtags', flat=True).distinct())
+        return tweet_models.HashTag.objects.filter(id__in=hashtag_ids)

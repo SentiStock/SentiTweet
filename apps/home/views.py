@@ -10,13 +10,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
 from stock.models import Company
-from stock.utils import get_relevent_model_context
+from stock.utils import get_relevant_model_context
 from tweet.models import HashTag
 
 
 @login_required(login_url="/login/")
 def index(request):
-    context = get_relevent_model_context()
+    context = get_relevant_model_context(companies=True, sets=True, users=True, contributors=True, hashtags=True)
     context['segment'] = 'index'
 
     html_template = loader.get_template('home/index.html')
@@ -27,7 +27,7 @@ def index(request):
 def pages(request):
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
-    context = get_relevent_model_context()
+    context = get_relevant_model_context(companies=True, sets=True, users=True, contributors=True, hashtags=True)
 
     try:
         load_template = request.path.split('/')[-1]

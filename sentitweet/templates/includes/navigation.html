@@ -6,7 +6,7 @@
             <div class="b-bg">
                 <i class="feather icon-trending-up"></i>
             </div>
-            <span class="b-title">Datta Able</span>
+            <span class="b-title">SentiTweet</span>
         </a>
     </div>
     <a class="mobile-menu" id="mobile-header" href="javascript:">
@@ -18,38 +18,50 @@
                 <i class="feather icon-maximize"></i>
             </a></li>
 
-            {% comment %} <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
                 <a class="dropdown-toggle" href="javascript:" data-toggle="dropdown">Search All</a>
                 <div class="dropdown">
                     <ul class="dropdown-menu" id="searchAllDropdown">
-                        <input class="form-control" type="text" placeholder="Search..." id="searchAllInput" onkeyup="filterSearchAll()">
-                        {% for company in companies %}
+                        <input class="form-control" type="text" placeholder="Search..." id="searchAllInput">
+                        {% for company in companies|slice:':10' %}
                             <li><a class="dropdown-item" href="/companies/{{company.symbol}}/">
                                 <span class="pcoded-micon"><i class="feather icon-bar-chart-2"></i></span><span
                                 class="pcoded-mtext">{{company.name}}</span>
                             </a></li>
                         {% endfor %}
-                        {% for hashtag in hashtags %}
+                        {% for hashtag in hashtags|slice:':10' %}
                             <li><a class="dropdown-item" href="/hashtags/{{hashtag.clean_value}}/">
                                 <span class="pcoded-micon"><i class="feather icon-hash"></i></span><span
                                 class="pcoded-mtext">{{hashtag.clean_value}}</span>
                             </a></li>
                         {% endfor %}
-                        {% for set in sets %}
+                        {% for set in sets|slice:':10' %}
                             <li><a class="dropdown-item" href="/sets/{{set.id}}/">
                                 <span class="pcoded-micon"><i class="feather icon-slack"></i></span><span
                                 class="pcoded-mtext">{{set.name}}</span>
                             </a></li>
                         {% endfor %}
+                        {% for twitter_user in twitter_users|slice:':10' %}
+                            <li><a class="dropdown-item" href="/twitterusers/{{twitter_user.id}}/">
+                                <span class="pcoded-micon"><i class="feather icon-slack"></i></span><span
+                                class="pcoded-mtext">{{twitter_user.username}}</span>
+                            </a></li>
+                        {% endfor %}
                     </ul>
                 </div>
-            </li> {% endcomment %}
+            </li>
 
             <li>
-                <!-- Toggle this page as favorite -->
-                <a href="javascript:" class="" onclick="">
-                    <i class="feather icon-star"></i>
-                </a>
+                {% if self %}
+                    <!-- Toggle this page as favorite -->
+                    <a href="#" id="favoriteButton" class="" onclick="toggle_favorite('{{self_type}}', {{self.id}})">
+                        {% if is_favorite %}
+                            <i class="feather icon-star-on"></i>
+                        {% else %}
+                            <i class="feather icon-star"></i>
+                        {% endif %}
+                    </a>
+                {% endif %}
             </li>
             {% comment %} <li class="nav-item">
                 <div class="main-search">
@@ -72,7 +84,7 @@
                     <input type="checkbox" id="theme-switch" class="d-none">
                 </label>
             </li>
-            <li>
+            {% comment %} <li>
                 <div class="dropdown">
                     <a class="dropdown-toggle" href="javascript:" data-toggle="dropdown"><i
                             class="icon feather icon-bell"></i></a>
@@ -81,7 +93,7 @@
                             <h6 class="d-inline-block m-b-0">Notifications</h6>
                             <div class="float-right">
                                 <a href="javascript:" class="m-r-10">mark as read</a>
-                                <a href="javascript:">clear all</a>
+                                <a href="ja vascript:">clear all</a>
                             </div>
                         </div>
                         <ul class="noti-body">
@@ -130,7 +142,7 @@
                         </div>
                     </div>
                 </div>
-            </li>
+            </li> {% endcomment %}
             <li>
                 <div class="dropdown drp-user">
                     <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown">
@@ -156,7 +168,7 @@
                     </div>
                 </div>
             </li>
-        </ul>
+        </ul> 
     </div>
 </header>
 <!-- [ Header ] end -->

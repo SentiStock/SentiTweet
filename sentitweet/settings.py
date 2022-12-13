@@ -14,9 +14,10 @@ import sys
 from pathlib import Path
 
 import nltk
+import pandas as pd
 from dotenv import load_dotenv
 
-nltk.download('stopwords')
+nltk.download('stopwords') #FIXME to deltete
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_crontab',
+    'rest_framework',
+
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'channels',
 
     'allauth',
     'allauth.account',
@@ -93,28 +98,28 @@ DATABASE_ENV = str(os.environ.get('DATABASE_ENV'))
 
 if DATABASE_ENV == 'production':
     database_name = os.environ.get('DATABASE_NAME')
-    user = os.environ.get('DATABASE_USERNAME')
-    password = os.environ.get('DATABASE_PASSWORD')
-    host = os.environ.get('DATABASE_HOST')
-    port = int(str(os.environ.get('DATABASE_PORT')))
+    database_user = os.environ.get('DATABASE_USERNAME')
+    database_password = os.environ.get('DATABASE_PASSWORD')
+    database_host = os.environ.get('DATABASE_HOST')
+    database_port = int(str(os.environ.get('DATABASE_PORT')))
 else:
     database_name = 'dbsentitweet'
-    user = 'sentitweet'
-    password = '12345'
-    host = 'postgres-db-sentitweet'
-    port = 5432
+    database_user = 'sentitweet'
+    database_password = '12345'
+    database_host = 'postgres-db-sentitweet'
+    database_port = 5432
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': database_name,
-        'USER': user,
-        'PASSWORD': password,
-        'HOST': host,
-        'PORT': port,
+        'USER': database_user,
+        'PASSWORD': database_password,
+        'HOST': database_host,
+        'PORT': database_port,
     }
 }
-SQLALCHEMY_DATABASE_URL = f'postgresql://{user}:{password}@{host}:{port}/{database_name}'
+SQLALCHEMY_DATABASE_URL = f'postgresql://{database_user}:{database_password}@{database_host}:{database_port}/{database_name}'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -145,22 +150,81 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static and Media files
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-ASSETS_ROOT = '/static/assets'
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
-STATIC_URL = '/static/'
-
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'sentitweet/static'),
 ) 
 
-# CRONJOBS
-CRONJOBS = [
-    # Everyday at 02:00 we fetch new tweets from twitter for every company
-    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+PLOTLY_COMPONENTS = [
+    'dash_core_components',
+    'dash_html_components',
+    'dash_bootstrap_components',
+    'dash_renderer',
+    'dpd_components',
+    # 'dpd_static_support',
+]
+# Staticfiles finders for locating dash app assets and related files (Dash static files)
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django_plotly_dash.finders.DashAssetFinder',
+    'django_plotly_dash.finders.DashComponentFinder',
+    'django_plotly_dash.finders.DashAppDirectoryFinder',
 ]
 
-X_FUNCTION_KEY=os.environ['X_FUNCTION_KEY']
+# CRONJOBS
+CRONJOBS = [
+    # Everyday 15 minutes we fetch new tweets from twitter for every company
+    ('*/15 * * * *', 'sentitweet.cron.fetch_new_tweets'),
+    ('*/15 * * * *', 'sentitweet.cron.tweet_score_sentiment'),
+]
+
+#Dash Plotly
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Redis
+# REDIS_ENV = str(os.environ.get('REDIS_ENV'))
+# if REDIS_ENV == 'production':
+#     redis_host = os.environ.get('REDIS_HOST')
+#     redis_port = int(os.environ.get('REDIS_PORT'))
+# else:
+#     redis_host = '127.0.0.1'
+#     redis_port = 6379
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [(redis_host, redis_port),],
+#         },
+#     },
+# }
+ASGI_APPLICATION = 'sentitweet.routing.application'
+
+SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY=os.environ['SENTITWEETAPI_SENTIMENT_X_FUNCTIONS_KEY']
+SENTITWEETAPI_SENTIMENT_URL=os.environ['SENTITWEETAPI_SENTIMENT_URL']
+
+SENTIMENT_COMPOUND_TRHESHOLD = 0.2
+DAYS_TILL_TWEETS_ARE_OUTDATED = 7
+
+pd.options.plotting.backend = "plotly"
+
+# Static and Media files
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'productionstaticfiles')
+STATIC_URL = '/static/'
+
+# Azure
+# https://django-storages.readthedocs.io/en/latest/backends/azure.html
+if os.environ.get('USE_AZURE_STATIC') == 'True':
+    AZURE_ACCOUNT_NAME=os.environ.get('AZURE_ACCOUNT_NAME')
+    AZURE_ACCOUNT_KEY=os.environ.get('AZURE_ACCOUNT_KEY')
+    AZURE_CONTAINER=os.environ.get('AZURE_CONTAINER')
+    AZURE_SSL=False
+
+    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    STATICFILES_STORAGE = 'sentitweet.storage_backends.PublicAzureStorage'
+    STATIC_URL = f'https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/{AZURE_CONTAINER}/'
+
+ASSETS_ROOT  = f'{STATIC_URL}assets'

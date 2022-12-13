@@ -4,9 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Q
 
+from home.models import PandasModelMixin
 
 class Favorite(models.Model):
-    user = models.ForeignKey('authentication.Contributor', related_name='favorites', on_delete=models.CASCADE)
+    user = models.ForeignKey('authentication.Contributor', related_name='my_favorites', on_delete=models.CASCADE)
     favorite_ct = models.ForeignKey(
         ContentType, 
         related_name='favorite_obj', 
@@ -21,10 +22,11 @@ class Favorite(models.Model):
         return f'{self.user} follows {self.favorite}'
 
     class Meta:
+        unique_together = ['user', 'favorite_ct', 'favorite_id']
         ordering = ['favorite_ct']
 
 
-class FavoritesModelMixin(models.Model):
+class FavoritesModelMixin(PandasModelMixin):
     @property
     def favorites(self):
         return Favorite.objects.filter(
@@ -45,4 +47,9 @@ class Contributor(AbstractUser, FavoritesModelMixin):
         choices = MODE_CHOICES,
         default = 'private'
     )
+
+    def is_favorite(self, object):
+        return self.my_favorites.filter(
+            Q(favorite_id=object.id) & Q(favorite_ct__model=object._meta.model_name)
+        ).exists()
 

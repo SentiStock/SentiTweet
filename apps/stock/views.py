@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.template import loader
 from stock.models import Company
 from stock.utils import (get_cluster_context, get_company_by_symbol_or_name,
-                         get_relevent_model_context)
+                         get_relevant_model_context)
 from tweet.models import HashTag
 from tweet.utils import cluster_tweets
 
@@ -18,7 +18,7 @@ def company(request):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render({}, request))
 
-    context = get_relevent_model_context()
+    context = get_relevant_model_context(companies=True, sets=True, users=True, contributors=True, hashtags=True)
 
     return render(request, 'stock/companies.html', context)
 
@@ -38,9 +38,26 @@ def company_detail(request, company_symbol_or_name):
 
     tweets = company.tweets.all()
 
-    context = get_relevent_model_context()
+    context = get_relevant_model_context(companies=True, sets=True, users=True, contributors=True, hashtags=True)
     context['company'] = company
+    context['self'] = company
+    context['self_type'] = company._meta.model_name
+    context['is_favorite'] = request.user.is_favorite(company)
     context['tweets'] = tweets
-    context['clusters'] = get_cluster_context(tweets)
+    context['dash_context'] =  {'company_id': {'value': company.id}}
+    # context['clusters'] = list(get_cluster_context(tweets))
 
-    return render(request, 'stock/detail.html', context)
+    return render(request, 'stock/company_page.html', context)
+
+
+@login_required(login_url="/login/")
+def discover(request):
+    context = get_relevant_model_context()
+    html_template = loader.get_template('stock/discover.html')
+    return HttpResponse(html_template.render(context, request))
+
+@login_required(login_url="/login/")
+def trends(request):
+    context = get_relevant_model_context()
+    html_template = loader.get_template('stock/trends.html')
+    return HttpResponse(html_template.render(context, request))
